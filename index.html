@@ -1,48 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Soduku</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <script src="build/react.js"></script>
+    <script src="build/react-with-addons.js"></script>
+    <script src="build/JSXTransformer.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="sudoku.js"></script>
+    <script type="text/jsx" src="build/main.js"></script>
+    <script src="build/controller.js"></script>
 
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <style>
 
-        body {
-            font-family: verdana;
+
+        .emptyField {
+            background: none;
+            -webkit-animation: lowlight 0.3s ease-in 1;
+            animation: lowlight 0.3s ease-in 1;
         }
 
-        #tab table td {
+        .sdFilled {
+            background: #eee;
+            -webkit-animation: highlight 0.5s ease-in 1;
+            animation: highlight 0.5s ease-in 1;
+        }
+
+        .initEmtpy {
+
+        }
+        .initFilled {
+           /* background: #ccc;
+            color:#fff;*/
+        }
+
+        .tableContainer {
             display: inline-block;
-            width: 25px;
-            height: 25px;
-            border: 1px solid #ccc;
-            text-align: center;
+            background: #fff;
+            margin:0 auto;
+            border-radius: 10px;
         }
 
         table {
-            padding: 0;
-            margin: 0;
+
         }
 
         table table {
-            background: #eee;
-            border: 1px solid #89205a;
+            border-collapse: separate;
         }
 
-        .emptyField {
-            background: #fff;
+        table table:hover {
+           background: #fff4f6;
         }
+
+        table table td:hover {
+            background: #cdeee8;
+        }
+
+        table table td {
+            border-bottom: 1px solid #999;
+            border-left: 1px solid #999;
+        }
+
+        table td:first-child table {
+            border-right:1px solid #999;
+        }
+
+        table tr:first-child table {
+            border-bottom:1px solid #999;
+        }
+
+        table tr:last-child table {
+            border-top:1px solid #999;
+        }
+
+        table td:last-child table {
+            border-left:1px solid #999;
+        }
+
+        table tr:first-child table tr:first-child td {
+            border-top:1px solid #999;
+        }
+
+        table td:last-child td:last-child {
+            border-right:1px solid #999;
+        }
+
+        table tr:first-child td:first-child tr:first-child td:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        table tr:last-child td:last-child tr:last-child  td:last-child {
+            border-radius: 0 0 10px 0;
+        }
+
+        table tr:first-child td:nth-child(3) tr:first-child  td:nth-child(3) {
+            border-radius: 0 10px 0 0;
+        }
+
+        table tr:last-child td:first-child tr:last-child  td:first-child {
+            border-radius: 0 0 0 10px;
+        }
+
+        table input[type="text"] {
+            border: 0px;
+            text-align: center;
+            width: 40px;
+            height:40px;
+            /*-webkit-transition: all .25s;
+            transition: all .25s; */
+            /*transition: background 1.0s ease;*/
+        }
+
+        @-webkit-keyframes highlight {
+            0% {background: yellow;}
+            100% {background: #eee;}
+        }
+
+        @keyframes highlight {
+            0% {background: yellow;}
+            100% {background: #eee;}
+        }
+
+        @-webkit-keyframes lowlight {
+            0% {background: #eed0cd;}
+            100% {background: none;}
+        }
+
+        @keyframes lowlight {
+            0% {background: #eed0cd;}
+            100% {background: none;}
+        }
+
+
     </style>
 </head>
 <body>
-
-<div id="info"></div>
-
-<table id="tab" style="border:1px solid #89205a;" cellpadding="0" cellspacing="0"></table>
-
-<button onclick="solver.run()" value="Solve">Solve</button>
-
+<div class="container-fluid">
+<header></header>
+<main id="playGround">
+</main>
+<footer>&copy; jHilscher</footer>
 </body>
+</div>
 </html>
