@@ -24,22 +24,42 @@ React.render(
 
 var SDCell = React.createClass({displayName: "SDCell",
 
+    parentTd: null,
+
+    componentDidMount: function () {
+        this.parentTd = $(React.findDOMNode(this.refs.input)).parent("td");
+        this.setParentClass("sdFilled","emptyField");
+        this.setParentClass("initFilled","initEmpty");
+    },
+
     getInitialState: function() {
         return {
-            sdValue: s[this.props.a][this.props.b],
-            initClass: s[this.props.a][this.props.b] == 0? " initEmtpy" : " initFilled"
+            sdValue: s[this.props.a][this.props.b]
         };
     },
 
+    setParentClass: function (filled, empty) {
+
+        if (this.parentTd) {
+            if (s[this.props.a][this.props.b] == 0) {
+                this.parentTd.removeClass(filled);
+                this.parentTd.addClass(empty);
+            } else {
+                this.parentTd.removeClass(empty);
+                this.parentTd.addClass(filled);
+            }
+        }
+
+    },
+
     handleChange: function(newValue) {
-       if(isNaN(newValue)) // only numbers allowed
+        if(isNaN(newValue)) // only numbers allowed
             return false;
-       s[this.props.a][this.props.b] = newValue;
+        s[this.props.a][this.props.b] = newValue;
 
+        this.setState({sdValue: s[this.props.a][this.props.b]});
 
-       this.setState({sdValue: s[this.props.a][this.props.b]});
-
-       $(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
+       //$(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
     },
 
     /**
@@ -50,16 +70,16 @@ var SDCell = React.createClass({displayName: "SDCell",
     },
 
     render: function () {
+
+        this.setParentClass("sdFilled","emptyField");
+
         var valueLink = {
             value: s[this.props.a][this.props.b],
             requestChange: this.handleChange
         };
 
-        var classes = s[this.props.a][this.props.b] == 0? "emptyField" : "sdFilled";
-        classes += this.state.initClass;
-
         return (
-                React.createElement("input", {ref: "input", className: classes, onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
+                React.createElement("input", {ref: "input", onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
             );
     }
 });
@@ -198,17 +218,11 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
                             )
                     ), 
                     React.createElement("div", {className: "row"}, 
-                        React.createElement("div", {className: "col-md-2"}, 
                             React.createElement("button", {type: "button", className: "btn btn-default btn-lg", "data-toggle": "button", onClick: this.onChange, "aria-pressed": "false", autoComplete: "off"}, 
                                 "Animation"
-                            )
-                        ), 
-                        React.createElement("div", {className: "col-md-1"}, 
-                            React.createElement("button", {type: "button", className: "btn btn-default btn-lg", onClick: this.clear}, "Clear")
-                        ), 
-                        React.createElement("div", {className: "col-md-1"}, 
+                            ), 
+                            React.createElement("button", {type: "button", className: "btn btn-default btn-lg", onClick: this.clear}, "Clear"), 
                             React.createElement("button", {type: "button", className: "btn btn-primary btn-lg", onClick: this.solve}, "Solve")
-                        )
                     )
                 )
             )
