@@ -338,6 +338,12 @@ var solver = (function () {
                 return true;
         },
 
+        /**
+         * Transforms a String sudoku to it's 2D array form.
+         *
+         * @param s String representation of a sudoku
+         * @returns 2D array
+         */
         getSudokuFromString: function (s) {
 
             var arr = s.split(',');
@@ -360,6 +366,11 @@ var solver = (function () {
             return res;
         },
 
+        /**
+         * Print the sudoku as a String.
+         *
+         * @returns String
+         */
         print: function() {
 
             if (!sudoku)
@@ -378,7 +389,13 @@ var solver = (function () {
 
         },
 
+        /**
+         * Runs the solver.
+         */
         run: function () {
+
+            var d = new Date();
+
             if (!this.solve()) {
                 try {
                     bt();
@@ -387,9 +404,15 @@ var solver = (function () {
                 }
             }
 
-            //this.print();
+            console.info("Solved in %d ms.", new Date() - d);
+
         },
 
+        /**
+         * Returns the sudoku as 2D array.
+         *
+         * @returns {2D array}
+         */
         getSudoku: function () {
             return sudoku;
         }
