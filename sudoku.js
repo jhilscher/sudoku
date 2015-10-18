@@ -1,38 +1,6 @@
 /**
  * Created by Joerg on 24.04.15.
  */
-
-/**
- * Clones a 2D Array.
- * @returns {Array}
- */
-Array.prototype.deepClone = function () {
-    var a = this.map(function(arr) {
-        return arr.slice(0);
-    });
-    return a;
-};
-
-Array.prototype.shuffle = function () {
-
-    var counter = this.length, temp, index;
-
-    // While there are elements in the array
-    while (counter > 0) {
-        // Pick a random index
-        index = Math.floor(Math.random() * counter);
-
-        // Decrease counter by 1
-        counter--;
-
-        // And swap the last element with it
-        temp = this[counter];
-        this[counter] = this[index];
-        this[index] = temp;
-    }
-
-};
-
 var solver = (function () {
     'use strict';
 
@@ -57,22 +25,6 @@ var solver = (function () {
     };
 
     var solved = false, hardmode = false, openFields = 81, runs = 0;
-
-    /**
-     * Trigger a Callback Call.
-     * @param args
-     */
-    var backtrack2 = function (a, b) {
-       if (animation && callback instanceof Function) {
-            setTimeout(function() {
-                callback("");
-                backtrack2(a,b);
-            }, TIMEOUT);
-       } else {
-           backtrack2(a,b);
-       }
-        //backtrack2(a,b);
-    };
 
     var triggerCallback = function(a) {
         if (callback instanceof Function) {
@@ -105,21 +57,29 @@ var solver = (function () {
 
     var stackIndex = 0;
     var saveIndex = 0;
+    var interval;
 
     var backtrackHandler = function () {
 
-        backtrack();
+        var timeout = animation? 10: 0;
 
+        stackIndex = 0;
+        saveIndex = 0;
+
+        if (animation) {
+            interval = setInterval( function () {
+                backtrack();
+            }, timeout);
+        } else {
+            do {
+                backtrack();
+            }
+            while (!solved);
+        }
     };
 
     var backtrack = function () {
 
-            var timeout = animation? 10: 0;
-
-            var stackIndex = 0;
-            var saveIndex = 0;
-
-            var interval = setInterval( function () {
 
                 if (animation)
                     triggerCallback("de");
@@ -195,54 +155,14 @@ var solver = (function () {
                         clearInterval(interval);
                         return false;
                     }
-
                 }
-
-            }, timeout);
-        //while (!solved);
-
-
-
-//            for (var i = stackIndex + 1; i < stack.length; i++) {
-//
-//                var curSave = stack[i];
-//
-//                var correct = false;
-//
-//                for (var j = 0; j < curSave.possibleValues.length; j++ ) {
-//
-//                    var value = curSave.possibleValues[j];
-//
-//                    var checked = check(value, curSave.cordA, curSave.cordB);
-//
-//                    correct |= checked;
-//
-//                    if (checked) {
-//                        sudoku[curSave.cordA][curSave.cordB] = value;
-//                        curSave.index = j;
-//                        //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
-//                        break;
-//                    }
-//                }
-//
-//                if (!correct) {
-//                    stackIndex = i - 1;
-//                    saveIndex = stack[stackIndex].index + 1;
-//                    //console.log("correction!");
-//                    break;
-//                }
-//
-//                if (correct && i == stack.length - 1) {
-//                    console.info("SOLVED! in %d runs.", runs);
-//                    solved = true;
-//                    triggerCallback("Solved");
-//                    return true;
-//                }
-//
-//            }
     };
 
-
+    /**
+     * Recursive Approach.
+     * @param stackIndex
+     * @param saveIndex
+     */
     var backtrack2 = function (stackIndex, saveIndex) {
 
         if (solved || stackIndex < 0 || stackIndex >= stack.length) {
@@ -341,7 +261,7 @@ var solver = (function () {
                     var index = 0;
                     var possibleValues = [];
 
-                    if (sudoku[i][j] != 0 && runs == 0) { // initaler set der offenen Felder
+                    if (sudoku[i][j] != 0 && runs == 0) {
                         openFields--;
                     }
 
@@ -355,9 +275,8 @@ var solver = (function () {
                             }
                         }
 
-                        // sicherer zug
+                        // save move
                         if (saved === 1) {
-                            console.warn("cords: " + i + " : " + j + " --> " + index);
                             sudoku[i][j] = index;
                             correction++;
                             openFields--;
@@ -393,7 +312,7 @@ var solver = (function () {
          * Transforms a String sudoku to it's 2D array form.
          *
          * @param s String representation of a sudoku
-         * @returns 2D array
+         * @returns Array
          */
         getSudokuFromString: function (s) {
 
@@ -462,7 +381,7 @@ var solver = (function () {
         /**
          * Returns the sudoku as 2D array.
          *
-         * @returns {2D array}
+         * @returns Array
          */
         getSudoku: function () {
             return sudoku;
