@@ -76,13 +76,7 @@ var solver = (function () {
 
     var triggerCallback = function(a) {
         if (callback instanceof Function) {
-            if (animation) {
-                setTimeout(function() {
-                    callback(a);
-                }, TIMEOUT);
-            } else {
-                callback(a);
-            }
+            callback(a);
         }
     };
 
@@ -109,92 +103,147 @@ var solver = (function () {
         return true;
     };
 
-    var bt = function () {
+    var stackIndex = 0;
+    var saveIndex = 0;
 
-        var stackIndex = 0;
-        var saveIndex = 0;
+    var backtrackHandler = function () {
 
-        do {
-
-            //triggerCallback("de");
-            runs++;
-
-            if (stackIndex < 0 || stackIndex >= stack.length) {
-                stackIndex = 0;
-                //console.log("Index < 0");
-            }
-
-            var assignFirst = stack[stackIndex];
-
-            if (assignFirst.possibleValues.length <= saveIndex ){
-                if (stackIndex > 1) {
-                    stackIndex--;
-                    saveIndex = stack[stackIndex].index + 1;
-                    continue;
-                }
-                else {
-                    console.info("Not solvable!");
-                    return false;
-                }
-            }
-
-            for (var h = stackIndex; h < stack.length; h++) {
-                var tmp = stack[h];
-                sudoku[tmp.cordA][tmp.cordB] = 0;
-            }
-
-            if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
-                assignFirst.index = saveIndex;
-                sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
-            } else {
-                saveIndex++;
-                continue;
-            }
-
-            for (var i = stackIndex + 1; i < stack.length; i++) {
-
-                var curSave = stack[i];
-
-                var correct = false;
-
-                for (var j = 0; j < curSave.possibleValues.length; j++ ) {
-
-                    var value = curSave.possibleValues[j];
-
-                    var checked = check(value, curSave.cordA, curSave.cordB);
-
-                    correct |= checked;
-
-                    if (checked) {
-                        sudoku[curSave.cordA][curSave.cordB] = value;
-                        curSave.index = j;
-                        //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
-                        break;
-                    }
-                }
-
-                if (!correct) {
-                    stackIndex = i - 1;
-                    saveIndex = stack[stackIndex].index + 1;
-                    //console.log("correction!");
-                    break;
-                }
-
-                if (correct && i == stack.length - 1) {
-                    console.info("SOLVED! in %d runs.", runs);
-                    solved = true;
-                    triggerCallback("Solved");
-                    return true;
-                }
-
-            }
-
-        } while (!solved);
+        backtrack();
 
     };
 
+    var backtrack = function () {
 
-    var backtrack = function (stackIndex, saveIndex) {
+            var timeout = animation? 10: 0;
+
+            var stackIndex = 0;
+            var saveIndex = 0;
+
+            var interval = setInterval( function () {
+
+                if (animation)
+                    triggerCallback("de");
+
+                runs++;
+
+                if (stackIndex < 0 || stackIndex >= stack.length) {
+                    stackIndex = 0;
+                    //console.log("Index < 0");
+                }
+
+                var assignFirst = stack[stackIndex];
+
+                if (assignFirst.possibleValues.length <= saveIndex ){
+                    if (stackIndex > 1) {
+                        stackIndex--;
+                        saveIndex = stack[stackIndex].index + 1;
+                        return;
+                    }
+                    else {
+                        console.info("Not solvable!");
+                        clearInterval(interval);
+                        return false;
+                    }
+                }
+
+                for (var h = stackIndex; h < stack.length; h++) {
+                    var tmp = stack[h];
+                    sudoku[tmp.cordA][tmp.cordB] = 0;
+                }
+
+                if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
+                    assignFirst.index = saveIndex;
+                    sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
+                } else {
+                    saveIndex++;
+                    return;
+                }
+
+                for (var i = stackIndex + 1; i < stack.length; i++) {
+
+                    var curSave = stack[i];
+
+                    var correct = false;
+
+                    for (var j = 0; j < curSave.possibleValues.length; j++ ) {
+
+                        var value = curSave.possibleValues[j];
+
+                        var checked = check(value, curSave.cordA, curSave.cordB);
+
+                        correct |= checked;
+
+                        if (checked) {
+                            sudoku[curSave.cordA][curSave.cordB] = value;
+                            curSave.index = j;
+                            //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
+                            break;
+                        }
+                    }
+
+                    if (!correct) {
+                        stackIndex = i - 1;
+                        saveIndex = stack[stackIndex].index + 1;
+                        //console.log("correction!");
+                        break;
+                    }
+
+                    if (correct && i == stack.length - 1) {
+                        console.info("SOLVED! in %d runs.", runs);
+                        solved = true;
+                        triggerCallback("Solved");
+                        clearInterval(interval);
+                        return false;
+                    }
+
+                }
+
+            }, timeout);
+        //while (!solved);
+
+
+
+//            for (var i = stackIndex + 1; i < stack.length; i++) {
+//
+//                var curSave = stack[i];
+//
+//                var correct = false;
+//
+//                for (var j = 0; j < curSave.possibleValues.length; j++ ) {
+//
+//                    var value = curSave.possibleValues[j];
+//
+//                    var checked = check(value, curSave.cordA, curSave.cordB);
+//
+//                    correct |= checked;
+//
+//                    if (checked) {
+//                        sudoku[curSave.cordA][curSave.cordB] = value;
+//                        curSave.index = j;
+//                        //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
+//                        break;
+//                    }
+//                }
+//
+//                if (!correct) {
+//                    stackIndex = i - 1;
+//                    saveIndex = stack[stackIndex].index + 1;
+//                    //console.log("correction!");
+//                    break;
+//                }
+//
+//                if (correct && i == stack.length - 1) {
+//                    console.info("SOLVED! in %d runs.", runs);
+//                    solved = true;
+//                    triggerCallback("Solved");
+//                    return true;
+//                }
+//
+//            }
+    };
+
+
+    var backtrack2 = function (stackIndex, saveIndex) {
 
         if (solved || stackIndex < 0 || stackIndex >= stack.length) {
             return;
@@ -276,6 +325,8 @@ var solver = (function () {
             openFields = 81;
             hardmode = false;
             stack = [];
+            stackIndex = 0;
+            saveIndex = 0;
         },
 
         solve: function () {
@@ -398,7 +449,7 @@ var solver = (function () {
 
             if (!this.solve()) {
                 try {
-                    bt();
+                    backtrackHandler();
                 } catch (e) {
                     console.error(e, runs);
                 }
