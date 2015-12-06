@@ -28,7 +28,7 @@ var SDCell = React.createClass({
 
     componentDidMount: function () {
         this.parentTd = $(React.findDOMNode(this.refs.input)).parent("td");
-        this.setParentClass("sdFilled","emptyField");
+        //this.setParentClass("sdFilled","emptyField");
         this.setParentClass("initFilled","initEmpty");
     },
 
@@ -70,6 +70,9 @@ var SDCell = React.createClass({
     },
 
     render: function () {
+
+        if (!this.props.solved)
+            this.setParentClass("initFilled","initEmpty");
 
         this.setParentClass("sdFilled","emptyField");
 
@@ -152,8 +155,10 @@ var SudokuPlayground = React.createClass({
 
     solve: function(){
            solver.set(s, this.update, this.state.isChecked);
-           solver.run();
-           this.setState({});
+           var result = solver.run();
+           this.setState({
+               solved: result
+           });
     },
 
     onChange: function () {
@@ -163,7 +168,8 @@ var SudokuPlayground = React.createClass({
     getInitialState: function(){
         return {
             isChecked: false,
-            sudokuAsString: ""
+            sudokuAsString: "",
+            solved: false
         };
     },
 
@@ -172,10 +178,15 @@ var SudokuPlayground = React.createClass({
     },
 
     setFromString: function () {
-        s = solver.getSudokuFromString(this.state.sudokuAsString);
-        solver.set(s, this.update, this.state.isChecked);
-        console.log(s);
-        this.setState({});
+
+        if (this.state.sudokuAsString) {
+            s = solver.getSudokuFromString(this.state.sudokuAsString);
+            solver.set(s, this.update, this.state.isChecked);
+            console.log(s);
+            this.setState({
+                solved: false
+            });
+        }
     },
 
     handleChange: function(newValue) {
@@ -197,7 +208,7 @@ var SudokuPlayground = React.createClass({
             <div className="tableContainer">
             <SDTable rowCount="3" columnCount="3">
                 <SDTable rowCount="3" columnCount="3">
-                    <SDCell />
+                    <SDCell solved={this.state.solved} />
                 </SDTable>
             </SDTable>
             </div>
@@ -210,19 +221,21 @@ var SudokuPlayground = React.createClass({
                         <div className="col-lg-6">
                             <div className="input-group">
                                 <input type="text" className="form-control" valueLink={valueLink} />
-                                    <span className="input-group-btn">
-                                        <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
-                                        <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
-                                    </span>
+                                <span className="input-group-btn">
+                                    <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
+                                    <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
+                                </span>
                                 </div>
                             </div>
                     </div>
                     <div className="row">
+                        <div className="col-lg-6">
                             <button type="button" className="btn btn-default btn-lg" data-toggle="button" onClick={this.onChange} aria-pressed="false" autoComplete="off">
                                 Animation
                             </button>
                             <button type="button" className="btn btn-default btn-lg" onClick={this.clear}>Clear</button>
                             <button type="button" className="btn btn-primary btn-lg" onClick={this.solve}>Solve</button>
+                        </div>
                     </div>
                 </div>
             </div>

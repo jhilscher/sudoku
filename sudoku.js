@@ -302,15 +302,18 @@ var solver = (function () {
 
             var d = new Date();
 
-            if (!this.solve()) {
-                try {
+            try {
+                if (!this.solve()) {
                     backtrackHandler();
-                } catch (e) {
-                    console.error(e, runs);
                 }
+            } catch (e) {
+                console.error(e, runs);
+                return false;
             }
 
+
             console.info("Solved in %d ms.", new Date() - d);
+            return solved;
 
         },
 
