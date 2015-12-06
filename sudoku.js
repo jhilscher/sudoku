@@ -37,17 +37,21 @@ var solver = (function () {
         for (var j = 0; j < 9; j++) {
 
             // Quadrat
-            if (sudoku[a][j] == value) {
+            if (sudoku[a][j] == value && b != j) {
                 return false;
             }
 
             // Reihe
-            if (sudoku[~~(a/3) * 3 + ~~(j/3)][~~(b/3) * 3 + (j%3)] == value) {
+            var x = ~~(a/3) * 3 + ~~(j/3);
+            var y = ~~(b/3) * 3 + (j%3);
+            if ((x != a || y != b) && sudoku[x][y] == value) {
                 return false;
             }
 
             // Spalte
-            if (sudoku[(a%3) + ~~(j/3) * 3][(b%3) + (j%3) * 3] == value) {
+            x = (a%3) + ~~(j/3) * 3;
+            y = (b%3) + (j%3) * 3;
+            if ((x != a || y != b) && sudoku[x][y] == value) {
                 return false;
             }
         }
@@ -71,24 +75,31 @@ var solver = (function () {
                 backtrack();
             }, timeout);
         } else {
-            do {
+            while (!solved) {
                 backtrack();
             }
-            while (!solved);
         }
     };
 
     var backtrack = function () {
-
 
                 if (animation)
                     triggerCallback("de");
 
                 runs++;
 
+                if (runs > 100000) {
+                    clearInterval(interval);
+                    solved = true;
+                    return;
+                }
+
                 if (stackIndex < 0 || stackIndex >= stack.length) {
                     stackIndex = 0;
-                    //console.log("Index < 0");
+                    console.warn("Index < 0", stackIndex);
+                    clearInterval(interval);
+                    solved = true;
+                    return;
                 }
 
                 var assignFirst = stack[stackIndex];
@@ -97,12 +108,14 @@ var solver = (function () {
                     if (stackIndex > 1) {
                         stackIndex--;
                         saveIndex = stack[stackIndex].index + 1;
+                        console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
                         return;
                     }
                     else {
-                        console.info("Not solvable!");
+                        console.warn("Not solvable!");
                         clearInterval(interval);
-                        return false;
+                        solved = true;
+                        return;
                     }
                 }
 
@@ -144,95 +157,19 @@ var solver = (function () {
                     if (!correct) {
                         stackIndex = i - 1;
                         saveIndex = stack[stackIndex].index + 1;
-                        //console.log("correction!");
+                        console.log("correction!");
                         break;
                     }
 
                     if (correct && i == stack.length - 1) {
                         console.info("SOLVED! in %d runs.", runs);
                         solved = true;
-                        triggerCallback("Solved");
                         clearInterval(interval);
+                        triggerCallback("Solved");
                         return false;
                     }
                 }
     };
-
-    /**
-     * Recursive Approach.
-     * @param stackIndex
-     * @param saveIndex
-     */
-    var backtrack2 = function (stackIndex, saveIndex) {
-
-        if (solved || stackIndex < 0 || stackIndex >= stack.length) {
-            return;
-        }
-
-        runs++;
-
-        var assignFirst = stack[stackIndex];
-
-        if (assignFirst.possibleValues.length <= saveIndex ){
-            if (stackIndex > 1)
-                backtrack(stackIndex - 1, stack[stackIndex - 1].index + 1);
-            else {
-                console.info("Not solvable!");
-            }
-            return;
-        }
-
-        for (var h = stackIndex; h < stack.length; h++) {
-            var tmp = stack[h];
-            sudoku[tmp.cordA][tmp.cordB] = 0;
-        }
-
-        if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
-            assignFirst.index = saveIndex;
-            sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
-        } else {
-            backtrack(stackIndex, saveIndex + 1);
-            return;
-        }
-
-        for (var i = stackIndex + 1; i < stack.length; i++) {
-
-            var curSave = stack[i];
-
-            var correct = false;
-
-            for (var j = 0; j < curSave.possibleValues.length; j++ ) {
-
-                var value = curSave.possibleValues[j];
-
-                var checked = check(value, curSave.cordA, curSave.cordB);
-
-                correct |= checked;
-
-                if (checked) {
-                    sudoku[curSave.cordA][curSave.cordB] = value;
-                    curSave.index = j;
-                    //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
-                    break;
-                }
-            }
-
-            if (!correct) {
-                var l = stack[i - 1].index + 1;
-                backtrack(i - 1, l);
-                return;
-            }
-
-            if (correct && i == stack.length - 1) {
-                console.info("SOLVED! in %d runs.", runs);
-                solved = true;
-                triggerCallback("Solved");
-                return;
-            }
-
-        }
-    };
-
 
     return {
         set: function (e, cb, ani) {
@@ -280,10 +217,13 @@ var solver = (function () {
                             sudoku[i][j] = index;
                             correction++;
                             openFields--;
-                        } else if (hardmode) {
+                        }
+                        else if (hardmode) {
                             stack.push(new Save(i, j, saved, possibleValues));
                         }
 
+                    } else  if (!check(sudoku[i][j], i, j)){
+                            throw "Not solvable";
                     }
                 }
             }
@@ -291,10 +231,6 @@ var solver = (function () {
             runs++;
 
             console.info("runs: " + runs + " correction: " + correction + " open: " + openFields);
-
-            if (runs > 500) {
-                return false;
-            }
 
             if (correction > 0 && openFields > 0) {
                 this.solve();
