@@ -1,10 +1,20 @@
 /**
  * Created by Joerg on 24.04.15.
  */
+
+/**
+ * Clones a 2D Array.
+ * @returns {Array}
+ */
+Array.prototype.deepClone = function () {
+    var a = this.map(function(arr) {
+        return arr.slice(0);
+    });
+    return a;
+};
+
 var solver = (function () {
     'use strict';
-
-    const TIMEOUT = 5;
 
     var animation = false;
 
@@ -37,21 +47,21 @@ var solver = (function () {
         for (var j = 0; j < 9; j++) {
 
             // Quadrat
-            if (sudoku[a][j] == value && b != j) {
+            if (sudoku[a][j] === value && b !== j) {
                 return false;
             }
 
             // Reihe
             var x = ~~(a/3) * 3 + ~~(j/3);
             var y = ~~(b/3) * 3 + (j%3);
-            if ((x != a || y != b) && sudoku[x][y] == value) {
+            if ((x != a || y != b) && sudoku[x][y] === value) {
                 return false;
             }
 
             // Spalte
             x = (a%3) + ~~(j/3) * 3;
             y = (b%3) + (j%3) * 3;
-            if ((x != a || y != b) && sudoku[x][y] == value) {
+            if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
         }
@@ -83,92 +93,94 @@ var solver = (function () {
 
     var backtrack = function () {
 
-                if (animation)
-                    triggerCallback("de");
+        if (animation)
+            triggerCallback("de");
 
-                runs++;
+        runs++;
 
-                if (runs > 100000) {
-                    clearInterval(interval);
-                    solved = true;
-                    return;
+
+        // fallback exit . to be removed
+        if (runs > 100000) {
+            clearInterval(interval);
+            solved = true;
+            return;
+        }
+
+        if (stackIndex < 0 || stackIndex >= stack.length) {
+            stackIndex = 0;
+            console.warn("Index < 0", stackIndex);
+            clearInterval(interval);
+            solved = true;
+            return;
+        }
+
+        var assignFirst = stack[stackIndex];
+
+        if (assignFirst.possibleValues.length <= saveIndex ){
+            if (stackIndex > 1) {
+                stackIndex--;
+                saveIndex = stack[stackIndex].index + 1;
+                console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
+                return;
+            }
+            else {
+                console.warn("Not solvable!");
+                clearInterval(interval);
+                solved = true;
+                return;
+            }
+        }
+
+        for (var h = stackIndex; h < stack.length; h++) {
+            var tmp = stack[h];
+            sudoku[tmp.cordA][tmp.cordB] = 0;
+        }
+
+        if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
+            assignFirst.index = saveIndex;
+            sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
+        } else {
+            saveIndex++;
+            return;
+        }
+
+        for (var i = stackIndex + 1; i < stack.length; i++) {
+
+            var curSave = stack[i];
+
+            var correct = false;
+
+            for (var j = 0; j < curSave.possibleValues.length; j++ ) {
+
+                var value = curSave.possibleValues[j];
+
+                var checked = check(value, curSave.cordA, curSave.cordB);
+
+                correct |= checked;
+
+                if (checked) {
+                    sudoku[curSave.cordA][curSave.cordB] = value;
+                    curSave.index = j;
+                    //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
+                    break;
                 }
+            }
 
-                if (stackIndex < 0 || stackIndex >= stack.length) {
-                    stackIndex = 0;
-                    console.warn("Index < 0", stackIndex);
-                    clearInterval(interval);
-                    solved = true;
-                    return;
-                }
+            if (!correct) {
+                stackIndex = i - 1;
+                saveIndex = stack[stackIndex].index + 1;
+                console.log("correction!");
+                break;
+            }
 
-                var assignFirst = stack[stackIndex];
-
-                if (assignFirst.possibleValues.length <= saveIndex ){
-                    if (stackIndex > 1) {
-                        stackIndex--;
-                        saveIndex = stack[stackIndex].index + 1;
-                        console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
-                        return;
-                    }
-                    else {
-                        console.warn("Not solvable!");
-                        clearInterval(interval);
-                        solved = true;
-                        return;
-                    }
-                }
-
-                for (var h = stackIndex; h < stack.length; h++) {
-                    var tmp = stack[h];
-                    sudoku[tmp.cordA][tmp.cordB] = 0;
-                }
-
-                if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
-                    assignFirst.index = saveIndex;
-                    sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
-                } else {
-                    saveIndex++;
-                    return;
-                }
-
-                for (var i = stackIndex + 1; i < stack.length; i++) {
-
-                    var curSave = stack[i];
-
-                    var correct = false;
-
-                    for (var j = 0; j < curSave.possibleValues.length; j++ ) {
-
-                        var value = curSave.possibleValues[j];
-
-                        var checked = check(value, curSave.cordA, curSave.cordB);
-
-                        correct |= checked;
-
-                        if (checked) {
-                            sudoku[curSave.cordA][curSave.cordB] = value;
-                            curSave.index = j;
-                            //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
-                            break;
-                        }
-                    }
-
-                    if (!correct) {
-                        stackIndex = i - 1;
-                        saveIndex = stack[stackIndex].index + 1;
-                        console.log("correction!");
-                        break;
-                    }
-
-                    if (correct && i == stack.length - 1) {
-                        console.info("SOLVED! in %d runs.", runs);
-                        solved = true;
-                        clearInterval(interval);
-                        triggerCallback("Solved");
-                        return false;
-                    }
-                }
+            if (correct && i == stack.length - 1) {
+                console.info("SOLVED! in %d runs.", runs);
+                solved = true;
+                clearInterval(interval);
+                triggerCallback("Solved");
+                return false;
+            }
+        }
     };
 
     return {
@@ -198,11 +210,11 @@ var solver = (function () {
                     var index = 0;
                     var possibleValues = [];
 
-                    if (sudoku[i][j] != 0 && runs == 0) {
+                    if (sudoku[i][j] !== 0 && runs === 0) {
                         openFields--;
                     }
 
-                    if (sudoku[i][j] == 0) {
+                    if (sudoku[i][j] === 0) {
 
                         for (var k = 1; k <= 9; k++) {
                             if (check(k, i, j)) {
@@ -240,7 +252,7 @@ var solver = (function () {
                 return false;
             }
 
-            if (openFields == 0)
+            if (openFields === 0)
                 return true;
         },
 
@@ -260,7 +272,7 @@ var solver = (function () {
 
             console.info("Loading sudoku from String", s, arr.length);
 
-            if (arr.length != 81)
+            if (arr.length !== 81)
                 return false;
 
             var res = [];
@@ -293,6 +305,18 @@ var solver = (function () {
 
             return a;
 
+        },
+
+        getInitialSokudok: function () {
+          var s = sudoku.deepClone();
+
+//            s.forEach(function (ele) {
+//                ele.forEach(function (innerEle) {
+//                    innerEle = !!innerEle;
+//                })
+//            });
+
+          return s;
         },
 
         /**

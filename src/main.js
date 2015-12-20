@@ -16,6 +16,10 @@ var s = [
     [0,0,9,0,0,0,0,0,0]
 ];
 
+var initialSudoku = s.deepClone();
+
+var running = false;
+
 React.render(
     <h1>Sudoku Solver</h1>,
     document.getElementsByTagName('header')[0]
@@ -29,7 +33,7 @@ var SDCell = React.createClass({
     componentDidMount: function () {
         this.parentTd = $(React.findDOMNode(this.refs.input)).parent("td");
         //this.setParentClass("sdFilled","emptyField");
-        this.setParentClass("initFilled","initEmpty");
+        //this.setParentClass("initFilled","initEmpty");
     },
 
     getInitialState: function() {
@@ -38,16 +42,10 @@ var SDCell = React.createClass({
         };
     },
 
-    setParentClass: function (filled, empty) {
+    setParentClass: function (newClass) {
 
         if (this.parentTd) {
-            if (s[this.props.a][this.props.b] == 0) {
-                this.parentTd.removeClass(filled);
-                this.parentTd.addClass(empty);
-            } else {
-                this.parentTd.removeClass(empty);
-                this.parentTd.addClass(filled);
-            }
+            this.parentTd.attr('class', newClass);
         }
 
     },
@@ -57,7 +55,7 @@ var SDCell = React.createClass({
             return false;
         s[this.props.a][this.props.b] = newValue;
 
-        this.setState({sdValue: s[this.props.a][this.props.b]});
+        this.setState({});
 
        //$(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
     },
@@ -69,15 +67,26 @@ var SDCell = React.createClass({
         $(React.findDOMNode(this.refs.input)).select();
     },
 
+    updateStyle: function () {
+        if (!running) {
+            if (initialSudoku[this.props.a][this.props.b])
+                this.setParentClass("initFilled");
+            else
+                this.setParentClass("initEmpty");
+        } else if (!initialSudoku[this.props.a][this.props.b]) {
+            if (s[this.props.a][this.props.b] == 0)
+                this.setParentClass("emptyField");
+            else
+                this.setParentClass("sdFilled");
+        }
+    },
+
     render: function () {
 
-        if (!this.props.solved)
-            this.setParentClass("initFilled","initEmpty");
-
-        this.setParentClass("sdFilled","emptyField");
+        this.updateStyle();
 
         var valueLink = {
-            value: s[this.props.a][this.props.b],
+            value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
             requestChange: this.handleChange
         };
 
@@ -136,14 +145,17 @@ var SudokuPlayground = React.createClass({
         //alert(event.target.value);
 
     },
+
     clear: function() {
         s.forEach(function(arr, a) {
             arr.forEach(function(ele, b) {
                 s[a][b] = 0;
+                initialSudoku[a][b] = 0;
             });
         });
         this.forceUpdate();
     },
+
     update: function (args) {
         console.log(args);
         this.forceUpdate();
@@ -151,14 +163,19 @@ var SudokuPlayground = React.createClass({
 
     componentDidMount: function () {
         solver.set(s, this.update, this.state.isChecked);
+        initialSudoku = solver.getInitialSokudok();
     },
 
     solve: function(){
-           solver.set(s, this.update, this.state.isChecked);
-           var result = solver.run();
-           this.setState({
-               solved: result
-           });
+        running = true;
+
+        solver.set(s, this.update, this.state.isChecked);
+        initialSudoku = solver.getInitialSokudok();
+
+
+
+        var result = solver.run();
+        //running = false;
     },
 
     onChange: function () {
@@ -169,7 +186,7 @@ var SudokuPlayground = React.createClass({
         return {
             isChecked: false,
             sudokuAsString: "",
-            solved: false
+            initialSudoku: []
         };
     },
 
@@ -182,10 +199,11 @@ var SudokuPlayground = React.createClass({
         if (this.state.sudokuAsString) {
             s = solver.getSudokuFromString(this.state.sudokuAsString);
             solver.set(s, this.update, this.state.isChecked);
+            initialSudoku = solver.getInitialSokudok();
             console.log(s);
-            this.setState({
-                solved: false
-            });
+            running = false;
+
+            this.update();
         }
     },
 
@@ -208,7 +226,7 @@ var SudokuPlayground = React.createClass({
             <div className="tableContainer">
             <SDTable rowCount="3" columnCount="3">
                 <SDTable rowCount="3" columnCount="3">
-                    <SDCell solved={this.state.solved} />
+                    <SDCell />
                 </SDTable>
             </SDTable>
             </div>
