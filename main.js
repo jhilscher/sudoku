@@ -4,6 +4,8 @@
 
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
+// todo: remove global vars
+
 var s = [
     [0,0,0,0,0,0,1,0,0],
     [1,0,0,0,7,0,8,0,0],
@@ -25,15 +27,17 @@ React.render(
     document.getElementsByTagName('header')[0]
 );
 
-
+/**
+ * Cell of the Sudoku Table.
+ * @type {*}
+ */
 var SDCell = React.createClass({displayName: "SDCell",
 
     parentTd: null,
 
     componentDidMount: function () {
         this.parentTd = $(React.findDOMNode(this.refs.input)).parent("td");
-        //this.setParentClass("sdFilled","emptyField");
-        //this.setParentClass("initFilled","initEmpty");
+        this.updateClass();
     },
 
     getInitialState: function() {
@@ -67,7 +71,7 @@ var SDCell = React.createClass({displayName: "SDCell",
         $(React.findDOMNode(this.refs.input)).select();
     },
 
-    updateStyle: function () {
+    updateClass: function () {
         if (!running) {
             if (initialSudoku[this.props.a][this.props.b])
                 this.setParentClass("initFilled");
@@ -83,20 +87,29 @@ var SDCell = React.createClass({displayName: "SDCell",
 
     render: function () {
 
-        this.updateStyle();
+        this.updateClass();
 
         var valueLink = {
             value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
             requestChange: this.handleChange
         };
 
+        // todo: solve this via media queries
+        var style = {
+            height: this.props.size,
+            width: this.props.size
+        };
+
         return (
-                React.createElement("input", {ref: "input", onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
+                React.createElement("input", {ref: "input", style: style, onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
             );
     }
 });
 
-
+/**
+ * Table elements, represents a html-table.
+ * @type {*}
+ */
 var SDTable = React.createClass({displayName: "SDTable",
 
     renderChildren: function (a,b) {
@@ -140,11 +153,11 @@ var SDTable = React.createClass({displayName: "SDTable",
     }
 });
 
+/**
+ * Complete Sudoku component.
+ * @type {*}
+ */
 var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
-    setValue: function(event) {
-        //alert(event.target.value);
-
-    },
 
     clear: function() {
         s.forEach(function(arr, a) {
@@ -172,10 +185,7 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         solver.set(s, this.update, this.state.isChecked);
         initialSudoku = solver.getInitialSokudok();
 
-
-
         var result = solver.run();
-        //running = false;
     },
 
     onChange: function () {
@@ -213,6 +223,10 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         });
     },
 
+    size: function () {
+        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 12);
+    },
+
     render: function(){
 
         var valueLink = {
@@ -223,13 +237,20 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         return (
             React.createElement("div", null, 
             React.createElement("div", {className: "jumbotron"}, 
-            React.createElement("div", {className: "tableContainer"}, 
-            React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
-                React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
-                    React.createElement(SDCell, null)
+                React.createElement("div", {className: "tableContainer"}, 
+                    React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
+                        React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
+                            React.createElement(SDCell, {size: this.size()})
+                        )
+                    )
+                ), 
+                React.createElement("div", {className: "btn-toolbar row-fluid"}, 
+                    React.createElement("button", {type: "button", className: "btn btn-default", "data-toggle": "button", onClick: this.onChange, "aria-pressed": "false", autoComplete: "off"}, 
+                    "Animation"
+                    ), 
+                    React.createElement("button", {type: "button", className: "btn btn-default", onClick: this.clear}, "Clear"), 
+                    React.createElement("button", {type: "button", className: "btn btn-primary", onClick: this.solve}, "Solve")
                 )
-            )
-            )
             ), 
 
             React.createElement("div", {className: "panel panel-default"}, 
@@ -245,16 +266,8 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
                                 )
                                 )
                             )
-                    ), 
-                    React.createElement("div", {className: "row"}, 
-                        React.createElement("div", {className: "col-lg-6"}, 
-                            React.createElement("button", {type: "button", className: "btn btn-default btn-lg", "data-toggle": "button", onClick: this.onChange, "aria-pressed": "false", autoComplete: "off"}, 
-                                "Animation"
-                            ), 
-                            React.createElement("button", {type: "button", className: "btn btn-default btn-lg", onClick: this.clear}, "Clear"), 
-                            React.createElement("button", {type: "button", className: "btn btn-primary btn-lg", onClick: this.solve}, "Solve")
-                        )
                     )
+
                 )
             )
             )
