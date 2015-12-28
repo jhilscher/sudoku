@@ -154,6 +154,30 @@ var SDTable = React.createClass({
 });
 
 /**
+ * Alert-Box that handles messages from the sudoku.js.
+ * @type {*}
+ */
+var InfoBox = React.createClass({
+    render: function () {
+
+        var text = this.props.msg.toString();
+
+        var classes = 'alert ';
+
+        if (this.props.msg.success) {
+            classes += 'alert-info';
+        } else {
+            classes += 'alert-danger';
+        }
+
+        return (
+            <div className={classes} role="alert">{text}</div>
+            );
+    }
+
+});
+
+/**
  * Complete Sudoku component.
  * @type {*}
  */
@@ -185,7 +209,10 @@ var SudokuPlayground = React.createClass({
         solver.set(s, this.update, this.state.isChecked);
         initialSudoku = solver.getInitialSokudok();
 
-        var result = solver.run();
+        var msg = solver.run();
+        this.setState({
+            showResults: true,
+            msg: msg});
     },
 
     onChange: function () {
@@ -196,7 +223,9 @@ var SudokuPlayground = React.createClass({
         return {
             isChecked: false,
             sudokuAsString: "",
-            initialSudoku: []
+            initialSudoku: [],
+            showResults: false,
+            msg: null
         };
     },
 
@@ -237,6 +266,8 @@ var SudokuPlayground = React.createClass({
         return (
             <div>
             <div className="jumbotron">
+                { this.state.showResults ?  <InfoBox msg={this.state.msg}/> : null }
+
                 <div className="tableContainer">
                     <SDTable rowCount="3" columnCount="3">
                         <SDTable rowCount="3" columnCount="3">

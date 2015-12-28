@@ -22,6 +22,20 @@ var solver = (function () {
 
     var sudoku;
 
+    var errors = '';
+
+    var Msg = function (success, runs, time, errors) {
+        return {
+            success: success,
+            errors: errors,
+            runs: runs,
+            time: time,
+            toString: function () {
+                return 'Run in ' + runs + ' iterations in ' + time + 'ms.';
+            }
+        };
+    };
+
     var stack = [];
 
     var Save = function(a, b, s, v) {
@@ -76,9 +90,9 @@ var solver = (function () {
     var backtrackHandler = function () {
 
         var timeout = animation? 10: 0;
+        saveIndex = 0;
 
         stackIndex = 0;
-        saveIndex = 0;
 
         if (animation) {
             interval = setInterval( function () {
@@ -196,6 +210,7 @@ var solver = (function () {
             stack = [];
             stackIndex = 0;
             saveIndex = 0;
+            errors = '';
         },
 
         solve: function () {
@@ -326,18 +341,23 @@ var solver = (function () {
 
             var d = new Date();
 
+            var success = true;
+
             try {
                 if (!this.solve()) {
                     backtrackHandler();
                 }
             } catch (e) {
                 console.error(e, runs);
-                return false;
+                errors += 'not solvable';
+                success = false;
             }
 
+            var elapsedTime = new Date() - d;
 
-            console.info("Solved in %d ms.", new Date() - d);
-            return solved;
+            console.info("Solved in %d ms.",elapsedTime);
+
+            return new Msg(success, runs, elapsedTime, errors);
 
         },
 
