@@ -16,6 +16,13 @@ Array.prototype.deepClone = function () {
 var solver = (function () {
     'use strict';
 
+    // animation timeout
+    const TIMEOUT = 10;
+
+    var openFields = 81;
+
+    var solved = false, hardmode = false, runs = 0;
+
     var animation = false;
 
     var callback;
@@ -24,6 +31,8 @@ var solver = (function () {
 
     var errors = '';
 
+    var stack = [];
+
     var Msg = function (success, runs, time, errors) {
         return {
             success: success,
@@ -31,12 +40,13 @@ var solver = (function () {
             runs: runs,
             time: time,
             toString: function () {
-                return 'Run in ' + runs + ' iterations in ' + time + 'ms.';
+                if (success)
+                    return 'Run in ' + this.runs + ' iterations in ' + this.time + ' ms.';
+                else
+                    return this.errors;
             }
         };
     };
-
-    var stack = [];
 
     var Save = function(a, b, s, v) {
         return {
@@ -47,8 +57,6 @@ var solver = (function () {
             index: 0
         };
     };
-
-    var solved = false, hardmode = false, openFields = 81, runs = 0;
 
     var triggerCallback = function(a) {
         if (callback instanceof Function) {
@@ -61,7 +69,7 @@ var solver = (function () {
         for (var j = 0; j < 9; j++) {
 
             // Quadrat
-            if (sudoku[a][j] === value && b !== j) {
+            if (sudoku[a][j] == value && b !== j) {
                 return false;
             }
 
@@ -89,15 +97,13 @@ var solver = (function () {
 
     var backtrackHandler = function () {
 
-        var timeout = animation? 10: 0;
         saveIndex = 0;
-
         stackIndex = 0;
 
         if (animation) {
             interval = setInterval( function () {
                 backtrack();
-            }, timeout);
+            }, TIMEOUT);
         } else {
             while (!solved) {
                 backtrack();
@@ -113,8 +119,8 @@ var solver = (function () {
         runs++;
 
 
-        // fallback exit . to be removed
-        if (runs > 100000) {
+        // fallback exit . todo: remove
+        if (runs > 500000) {
             clearInterval(interval);
             solved = true;
             return;
@@ -122,7 +128,6 @@ var solver = (function () {
 
         if (stackIndex < 0 || stackIndex >= stack.length) {
             stackIndex = 0;
-            console.warn("Index < 0", stackIndex);
             clearInterval(interval);
             solved = true;
             return;
@@ -134,14 +139,13 @@ var solver = (function () {
             if (stackIndex > 1) {
                 stackIndex--;
                 saveIndex = stack[stackIndex].index + 1;
-                console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
+                //console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
                 return;
             }
             else {
-                console.warn("Not solvable!");
                 clearInterval(interval);
                 solved = true;
-                return;
+                throw "Not solvable";
             }
         }
 
@@ -183,7 +187,6 @@ var solver = (function () {
             if (!correct) {
                 stackIndex = i - 1;
                 saveIndex = stack[stackIndex].index + 1;
-                console.log("correction!");
                 break;
             }
 
@@ -249,8 +252,8 @@ var solver = (function () {
                             stack.push(new Save(i, j, saved, possibleValues));
                         }
 
-                    } else  if (!check(sudoku[i][j], i, j)){
-                            throw "Not solvable";
+                    } else if (!check(sudoku[i][j], i, j)){
+                        throw "Not solvable";
                     }
                 }
             }
@@ -342,20 +345,23 @@ var solver = (function () {
             var d = new Date();
 
             var success = true;
+            var elapsedTime = 0;
+
 
             try {
                 if (!this.solve()) {
                     backtrackHandler();
                 }
+
+                elapsedTime = new Date() - d;
+
+                console.info("Solved in %d ms.", elapsedTime);
+
             } catch (e) {
                 console.error(e, runs);
-                errors += 'not solvable';
+                errors += e;
                 success = false;
             }
-
-            var elapsedTime = new Date() - d;
-
-            console.info("Solved in %d ms.",elapsedTime);
 
             return new Msg(success, runs, elapsedTime, errors);
 

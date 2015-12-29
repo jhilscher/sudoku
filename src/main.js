@@ -47,19 +47,17 @@ var SDCell = React.createClass({
     },
 
     setParentClass: function (newClass) {
-
         if (this.parentTd) {
             this.parentTd.attr('class', newClass);
         }
-
     },
 
     handleChange: function(newValue) {
         if(isNaN(newValue)) // only numbers allowed
             return false;
-        s[this.props.a][this.props.b] = newValue;
+        s[this.props.a][this.props.b] = ~~newValue;
 
-        this.setState({});
+        this.setState({}); // update
 
        //$(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
     },
@@ -190,7 +188,9 @@ var SudokuPlayground = React.createClass({
                 initialSudoku[a][b] = 0;
             });
         });
-        this.forceUpdate();
+        this.setState({
+            showResults: false,
+            msg: null});
     },
 
     update: function (args) {
@@ -242,7 +242,9 @@ var SudokuPlayground = React.createClass({
             console.log(s);
             running = false;
 
-            this.update();
+            this.setState({
+                showResults: false,
+                msg: null});
         }
     },
 
@@ -266,7 +268,7 @@ var SudokuPlayground = React.createClass({
         return (
             <div>
             <div className="jumbotron">
-                { this.state.showResults ?  <InfoBox msg={this.state.msg}/> : null }
+                { this.state.showResults ?  <InfoBox msg={this.state.msg} /> : null }
 
                 <div className="tableContainer">
                     <SDTable rowCount="3" columnCount="3">
