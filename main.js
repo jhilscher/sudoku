@@ -47,19 +47,17 @@ var SDCell = React.createClass({displayName: "SDCell",
     },
 
     setParentClass: function (newClass) {
-
         if (this.parentTd) {
             this.parentTd.attr('class', newClass);
         }
-
     },
 
     handleChange: function(newValue) {
         if(isNaN(newValue)) // only numbers allowed
             return false;
-        s[this.props.a][this.props.b] = newValue;
+        s[this.props.a][this.props.b] = ~~newValue;
 
-        this.setState({});
+        this.setState({}); // update
 
        //$(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
     },
@@ -154,6 +152,30 @@ var SDTable = React.createClass({displayName: "SDTable",
 });
 
 /**
+ * Alert-Box that handles messages from the sudoku.js.
+ * @type {*}
+ */
+var InfoBox = React.createClass({displayName: "InfoBox",
+    render: function () {
+
+        var text = this.props.msg.toString();
+
+        var classes = 'alert ';
+
+        if (this.props.msg.success) {
+            classes += 'alert-info';
+        } else {
+            classes += 'alert-danger';
+        }
+
+        return (
+            React.createElement("div", {className: classes, role: "alert"}, text)
+            );
+    }
+
+});
+
+/**
  * Complete Sudoku component.
  * @type {*}
  */
@@ -166,7 +188,9 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
                 initialSudoku[a][b] = 0;
             });
         });
-        this.forceUpdate();
+        this.setState({
+            showResults: false,
+            msg: null});
     },
 
     update: function (args) {
@@ -185,7 +209,10 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         solver.set(s, this.update, this.state.isChecked);
         initialSudoku = solver.getInitialSokudok();
 
-        var result = solver.run();
+        var msg = solver.run();
+        this.setState({
+            showResults: true,
+            msg: msg});
     },
 
     onChange: function () {
@@ -196,7 +223,9 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         return {
             isChecked: false,
             sudokuAsString: "",
-            initialSudoku: []
+            initialSudoku: [],
+            showResults: false,
+            msg: null
         };
     },
 
@@ -213,7 +242,9 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
             console.log(s);
             running = false;
 
-            this.update();
+            this.setState({
+                showResults: false,
+                msg: null});
         }
     },
 
@@ -237,6 +268,8 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
         return (
             React.createElement("div", null, 
             React.createElement("div", {className: "jumbotron"}, 
+                 this.state.showResults ?  React.createElement(InfoBox, {msg: this.state.msg}) : null, 
+
                 React.createElement("div", {className: "tableContainer"}, 
                     React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
                         React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
