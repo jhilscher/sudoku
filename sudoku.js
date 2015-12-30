@@ -33,10 +33,11 @@ var solver = (function () {
 
     var stack = [];
 
-    var Msg = function (success, runs, time, errors) {
+    var Msg = function (success, runs, time, errors, save) {
         return {
             success: success,
             errors: errors,
+            save: save,
             runs: runs,
             time: time,
             toString: function () {
@@ -143,9 +144,7 @@ var solver = (function () {
                 return;
             }
             else {
-                clearInterval(interval);
-                solved = true;
-                throw "Not solvable";
+                throw new Msg(false, runs, null, 'not solvable', stack[stackIndex]);
             }
         }
 
@@ -253,7 +252,8 @@ var solver = (function () {
                         }
 
                     } else if (!check(sudoku[i][j], i, j)){
-                        throw "Not solvable";
+                        throw new Msg(false, runs, null, 'error found in initial sudoku',
+                            new Save(i, j, null, possibleValues));
                     }
                 }
             }
@@ -358,9 +358,8 @@ var solver = (function () {
                 console.info("Solved in %d ms.", elapsedTime);
 
             } catch (e) {
-                console.error(e, runs);
-                errors += e;
-                success = false;
+                console.error(e.toString());
+                return e;
             }
 
             return new Msg(success, runs, elapsedTime, errors);

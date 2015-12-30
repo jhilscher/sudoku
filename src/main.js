@@ -92,11 +92,15 @@ var SDCell = React.createClass({
             requestChange: this.handleChange
         };
 
-        // todo: solve this via media queries
         var style = {
             height: this.props.size,
             width: this.props.size
         };
+
+        // todo: unschön
+        if (this.props.info && this.props.info.save && this.props.info.save.cordA == this.props.a && this.props.info.save.cordB == this.props.b) {
+            style.background = '#f00';
+        }
 
         return (
                 <input ref="input" style={style} onClick={this.selectAll} valueLink={valueLink} maxLength="1" size="1" type="text" />
@@ -134,10 +138,10 @@ var SDTable = React.createClass({
             <tbody>
                 {rows.map(function (eRow, iRow) {
                     return (
-                        <tr>
+                        <tr key={eRow}>
                         {columns.map(function (eCol, iCol) {
                             return (
-                                <td key={iCol}>
+                                <td key={iCol+eCol}>
                                     {self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)}
                                 </td>
                         );
@@ -255,7 +259,7 @@ var SudokuPlayground = React.createClass({
     },
 
     size: function () {
-        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 12);
+        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 10);
     },
 
     render: function(){
@@ -273,7 +277,7 @@ var SudokuPlayground = React.createClass({
                 <div className="tableContainer">
                     <SDTable rowCount="3" columnCount="3">
                         <SDTable rowCount="3" columnCount="3">
-                            <SDCell size={this.size()} />
+                            <SDCell size={this.size()} info={this.state.msg} />
                         </SDTable>
                     </SDTable>
                 </div>

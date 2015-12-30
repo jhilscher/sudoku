@@ -92,11 +92,15 @@ var SDCell = React.createClass({displayName: "SDCell",
             requestChange: this.handleChange
         };
 
-        // todo: solve this via media queries
         var style = {
             height: this.props.size,
             width: this.props.size
         };
+
+        // todo: unschön
+        if (this.props.info && this.props.info.save && this.props.info.save.cordA == this.props.a && this.props.info.save.cordB == this.props.b) {
+            style.background = '#f00';
+        }
 
         return (
                 React.createElement("input", {ref: "input", style: style, onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
@@ -134,10 +138,10 @@ var SDTable = React.createClass({displayName: "SDTable",
             React.createElement("tbody", null, 
                 rows.map(function (eRow, iRow) {
                     return (
-                        React.createElement("tr", null, 
+                        React.createElement("tr", {key: eRow}, 
                         columns.map(function (eCol, iCol) {
                             return (
-                                React.createElement("td", {key: iCol}, 
+                                React.createElement("td", {key: iCol+eCol}, 
                                     self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)
                                 )
                         );
@@ -255,7 +259,7 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
     },
 
     size: function () {
-        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 12);
+        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 10);
     },
 
     render: function(){
@@ -273,7 +277,7 @@ var SudokuPlayground = React.createClass({displayName: "SudokuPlayground",
                 React.createElement("div", {className: "tableContainer"}, 
                     React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
                         React.createElement(SDTable, {rowCount: "3", columnCount: "3"}, 
-                            React.createElement(SDCell, {size: this.size()})
+                            React.createElement(SDCell, {size: this.size(), info: this.state.msg})
                         )
                     )
                 ), 
