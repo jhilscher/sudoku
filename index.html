@@ -116,7 +116,7 @@
             /*border-radius: 0 0 0 10px;*/
         /*}*/
 
-        table input[type="text"] {
+        table input[type="number"] {
             border: 0px;
             text-align: center;
             /*width: 40px;*/
@@ -125,6 +125,14 @@
             /*-webkit-transition: all .25s;
             transition: all .25s; */
             /*transition: background 1.0s ease;*/
+        }
+
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            /* display: none; <- Crashes Chrome on hover */
+            -webkit-appearance: none;
+            margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
         }
 
         @-webkit-keyframes highlight {
