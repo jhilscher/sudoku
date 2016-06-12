@@ -25,6 +25,9 @@ var solver = (function () {
 
     var animation = false;
 
+    /**
+     * Status information callback, triggered in animation mode.
+     */
     var callback;
 
     var sudoku;
@@ -60,7 +63,7 @@ var solver = (function () {
     };
 
     var triggerCallback = function(a) {
-        if (callback instanceof Function) {
+        if (callback instanceof Function && animation) {
             callback(a);
         }
     };
@@ -96,23 +99,26 @@ var solver = (function () {
     var saveIndex = 0;
     var interval;
 
-    var backtrackHandler = function () {
+    var backtrackHandler = function (runCallback) {
 
-        saveIndex = 0;
-        stackIndex = 0;
+        var endEvent = function () {
+            clearInterval(interval);
+            solved = true;
+            runCallback();
+        };
 
         if (animation) {
-            interval = setInterval( function () {
-                backtrack();
+            interval = setInterval(function () {
+                backtrack(endEvent);
             }, TIMEOUT);
         } else {
             while (!solved) {
-                backtrack();
+                backtrack(endEvent);
             }
         }
     };
 
-    var backtrack = function () {
+    var backtrack = function (endEvent) {
 
         if (animation)
             triggerCallback("de");
@@ -122,15 +128,13 @@ var solver = (function () {
 
         // fallback exit . todo: remove
         if (runs > 500000) {
-            clearInterval(interval);
-            solved = true;
+            endEvent();
             return;
         }
 
         if (stackIndex < 0 || stackIndex >= stack.length) {
             stackIndex = 0;
-            clearInterval(interval);
-            solved = true;
+            endEvent();
             return;
         }
 
@@ -191,19 +195,24 @@ var solver = (function () {
 
             if (correct && i == stack.length - 1) {
                 console.info("SOLVED! in %d runs.", runs);
-                solved = true;
-                clearInterval(interval);
-                triggerCallback("Solved");
-                return false;
+                endEvent();
+                triggerCallback("SOLVED");
+                return;
             }
         }
     };
 
     return {
+        /**
+         * Sets the initials values of the solver.
+         *
+         * @param e Sudoku 2d array
+         * @param ani
+         */
         set: function (e, cb, ani) {
             console.info("Set Sudoku: ", e);
             animation = ani;
-            callback = cb;
+            callback = cb; // todo remove this callback
             runs = 0;
             solved = false;
             sudoku = e;
@@ -215,10 +224,14 @@ var solver = (function () {
             errors = '';
         },
 
+        /**
+         * 1. Step of solving a sudoku. Fills all obvious cells.
+         *
+         * @returns {boolean} If this function could solve the whole sudoku.
+         */
         solve: function () {
 
             var correction = 0;
-            stack = [];
 
             for (var i = 0; i < sudoku.length; i++) {
                 for (var j = 0; j < sudoku[i].length; j++) {
@@ -260,7 +273,7 @@ var solver = (function () {
 
             runs++;
 
-            console.info("runs: " + runs + " correction: " + correction + " open: " + openFields);
+            console.info("runs: %d correction: %d open: %d", runs, correction, openFields);
 
             if (correction > 0 && openFields > 0) {
                 this.solve();
@@ -278,7 +291,7 @@ var solver = (function () {
          * Transforms a String sudoku to it's 2D array form.
          *
          * @param s String representation of a sudoku
-         * @returns Array
+         * @returns {Array}
          */
         getSudokuFromString: function (s) {
 
@@ -339,31 +352,28 @@ var solver = (function () {
 
         /**
          * Runs the solver.
+         *
+         * @param runCallback Callback function, triggered after finishing.
          */
-        run: function () {
+        run: function (runCallback) {
 
             var d = new Date();
-
             var success = true;
             var elapsedTime = 0;
 
 
             try {
                 if (!this.solve()) {
-                    backtrackHandler();
+                    backtrackHandler(function () {
+                        elapsedTime = new Date() - d;
+                        console.info("Solved in %d ms.", elapsedTime);
+                        runCallback(new Msg(success, runs, elapsedTime, errors));
+                    });
                 }
-
-                elapsedTime = new Date() - d;
-
-                console.info("Solved in %d ms.", elapsedTime);
-
-            } catch (e) {
+             } catch (e) {
                 console.error(e.toString());
-                return e;
+                runCallback(e);
             }
-
-            return new Msg(success, runs, elapsedTime, errors);
-
         },
 
         /**

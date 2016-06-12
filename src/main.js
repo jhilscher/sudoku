@@ -213,10 +213,15 @@ var SudokuPlayground = React.createClass({
         solver.set(s, this.update, this.state.isChecked);
         initialSudoku = solver.getInitialSokudok();
 
-        var msg = solver.run();
-        this.setState({
-            showResults: true,
-            msg: msg});
+        var success = function (msg) {
+            this.setState({
+                showResults: true,
+                msg: msg});
+        };
+        var successCallback = success.bind(this);
+
+        solver.run(successCallback);
+
     },
 
     onChange: function () {
