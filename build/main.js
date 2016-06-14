@@ -103,7 +103,7 @@ var SDCell = React.createClass({displayName: "SDCell",
         }
 
         return (
-                React.createElement("input", {ref: "input", style: style, onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "text"})
+                React.createElement("input", {ref: "input", style: style, onClick: this.selectAll, valueLink: valueLink, maxLength: "1", size: "1", type: "number"})
             );
     }
 });
