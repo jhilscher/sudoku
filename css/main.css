@@ -52,7 +52,7 @@
     background: #cdeee8;
 }
 
-.row .row div {
+.row .row .column div {
     border-bottom: 1px solid #999;
     border-left: 1px solid #999;
 
