@@ -36,78 +36,56 @@
     border-radius: 10px;
 }
 
-table {
-    max-width: 600px;
+.column {
+    float: left;
 }
 
-table table {
+.row .row {
     border-collapse: separate;
 }
 
-table table:hover {
+.row div:hover {
     background: #fff4f6;
 }
 
-table table td:hover {
+.row .row div:hover {
     background: #cdeee8;
 }
 
-table table td {
+.row .row div {
+    border-bottom: 1px solid #999;
+    border-left: 1px solid #999;
+
+}
+
+.tableContainer .row .column .container-fluid {
     border-bottom: 1px solid #999;
     border-left: 1px solid #999;
 }
 
-table td:first-child table {
-    border-right:1px solid #999;
-}
-
-table tr:first-child table {
-    border-bottom:1px solid #999;
-}
-
-table tr:last-child table {
+.tableContainer .row:first-child .container-fluid {
     border-top:1px solid #999;
 }
 
-table td:last-child table {
-    border-left:1px solid #999;
-}
-
-table tr:first-child table tr:first-child td {
-    border-top:1px solid #999;
-}
-
-table td:last-child td:last-child {
+.tableContainer .row .column:last-child .container-fluid {
     border-right:1px solid #999;
 }
 
-/*table tr:first-child td:first-child tr:first-child td:first-child {*/
-/*border-radius: 10px 0 0 0;*/
-/*}*/
 
-/*table tr:last-child td:last-child tr:last-child  td:last-child {*/
-/*border-radius: 0 0 10px 0;*/
-/*}*/
+.tableContainer .row:first-child .column .row:first-child {
+    border-top:1px solid #999;
+}
 
-/*table tr:first-child td:nth-child(3) tr:first-child  td:nth-child(3) {*/
-/*border-radius: 0 10px 0 0;*/
-/*}*/
+.tableContainer .row .column:last-child .row .column:last-child {
+    border-right:1px solid #999;
+}
 
-/*table tr:last-child td:first-child tr:last-child  td:first-child {*/
-/*border-radius: 0 0 0 10px;*/
-/*}*/
-
-table input[type="number"] {
+.column input[type="number"] {
     border: 0px;
     text-align: center;
-    /*width: 40px;*/
-    /*height: 40px;*/
-    /*background: none;*/
-    /*-webkit-transition: all .25s;
-    transition: all .25s; */
-    /*transition: background 1.0s ease;*/
+    width: 9vmin;
+    height: 9vmin;
 }
-
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
