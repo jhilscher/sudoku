@@ -1,8 +1,14 @@
 /**
  * Created by Joerg on 07.06.15.
  */
+import React, { Component } from 'react';
+import solver from './sudoku';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
 
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+
+//var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 // todo: remove global vars
 
@@ -22,10 +28,24 @@ var initialSudoku = s.deepClone();
 
 var running = false;
 
-React.render(
-    <h1>Sudoku Solver</h1>,
-    document.getElementsByTagName('header')[0]
-);
+
+var StateTwoWayMixin = {
+    linkState: function () {
+        return {
+            value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
+            onChange: function (event) {
+                var newValue = event.target.value;
+
+                if(isNaN(newValue)) // only numbers allowed
+                    return false;
+
+                s[this.props.a][this.props.b] = ~~newValue;
+
+                this.setState({initValue: newValue});
+            }.bind(this)
+        }
+    }
+};
 
 /**
  * Cell of the Sudoku Table.
@@ -33,65 +53,40 @@ React.render(
  */
 var SDCell = React.createClass({
 
-    parentDiv: null,
-    initClass: null,
+    mixins: [StateTwoWayMixin],
 
     componentDidMount: function () {
-        this.parentDiv = $(React.findDOMNode(this.refs.input)).parent("div");
-        this.initClass = this.parentDiv.attr('class');
-        this.updateClass();
     },
 
     getInitialState: function() {
         return {
-            sdValue: s[this.props.a][this.props.b]
+            initValue: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: ''
         };
-    },
-
-    setParentClass: function (newClass) {
-        if (this.parentDiv) {
-            this.parentDiv.attr('class', newClass + ' ' + this.initClass);
-        }
-    },
-
-    handleChange: function(newValue) {
-        if(isNaN(newValue)) // only numbers allowed
-            return false;
-
-        s[this.props.a][this.props.b] = ~~newValue;
-
-        this.setState({}); // update
     },
 
     /**
      * Selects all of this input field.
      */
     selectAll: function() {
-        $(React.findDOMNode(this.refs.input)).select();
+        $(this.refs.input).select();
     },
 
-    updateClass: function () {
+    getClassName: function () {
         if (!running) {
             if (initialSudoku[this.props.a][this.props.b])
-                this.setParentClass("initFilled");
+                return "initFilled";
             else
-                this.setParentClass("initEmpty");
+                return "initEmpty";
         } else if (!initialSudoku[this.props.a][this.props.b]) {
             if (s[this.props.a][this.props.b] == 0)
-                this.setParentClass("emptyField");
+                return "emptyField";
             else
-                this.setParentClass("sdFilled");
+                return "sdFilled";
         }
     },
 
     render: function () {
 
-        this.updateClass();
-
-        var valueLink = {
-            value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
-            requestChange: this.handleChange
-        };
 
         var style = {};
 
@@ -101,7 +96,9 @@ var SDCell = React.createClass({
         }
 
         return (
-                <input ref="input" style={style} onClick={this.selectAll} valueLink={valueLink} maxLength="1" size="1" type="number" />
+            <div className={this.getClassName()}>
+                <input ref="input" style={style} value={this.state.initValue} {...this.linkState()} onClick={this.selectAll}  maxLength="1" size="1" type="number" />
+            </div>
             );
     }
 });
@@ -181,7 +178,7 @@ var InfoBox = React.createClass({
  * Complete Sudoku component.
  * @type {*}
  */
-var SudokuPlayground = React.createClass({
+var App = React.createClass({
 
     clear: function() {
         s.forEach(function(arr, a) {
@@ -255,18 +252,16 @@ var SudokuPlayground = React.createClass({
         }
     },
 
-    handleChange: function(newValue) {
+    handleChange: function(event) {
+
+        var newValue = event.target.value;
+
         this.setState({
             sudokuAsString: newValue
         });
     },
 
     render: function(){
-
-        var valueLink = {
-            value: this.state.sudokuAsString,
-            requestChange: this.handleChange
-        };
 
         return (
             <div>
@@ -295,7 +290,7 @@ var SudokuPlayground = React.createClass({
                     <div className="row">
                         <div className="col-lg-6">
                             <div className="input-group">
-                                <input type="text" className="form-control" valueLink={valueLink} />
+                                <input type="text" className="form-control" value={this.state.sudokuAsString} onChange={this.handleChange} />
                                 <span className="input-group-btn">
                                     <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
                                     <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
@@ -311,4 +306,6 @@ var SudokuPlayground = React.createClass({
     }
 });
 
-React.render(<SudokuPlayground/>, document.getElementById('playGround'));
+//React.render(<SudokuPlayground/>, document.getElementById('playGround'));
+
+export default App;
