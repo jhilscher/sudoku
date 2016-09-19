@@ -33,10 +33,12 @@ React.render(
  */
 var SDCell = React.createClass({
 
-    parentTd: null,
+    parentDiv: null,
+    initClass: null,
 
     componentDidMount: function () {
-        this.parentTd = $(React.findDOMNode(this.refs.input)).parent("td");
+        this.parentDiv = $(React.findDOMNode(this.refs.input)).parent("div");
+        this.initClass = this.parentDiv.attr('class');
         this.updateClass();
     },
 
@@ -47,19 +49,18 @@ var SDCell = React.createClass({
     },
 
     setParentClass: function (newClass) {
-        if (this.parentTd) {
-            this.parentTd.attr('class', newClass);
+        if (this.parentDiv) {
+            this.parentDiv.attr('class', newClass + ' ' + this.initClass);
         }
     },
 
     handleChange: function(newValue) {
         if(isNaN(newValue)) // only numbers allowed
             return false;
+
         s[this.props.a][this.props.b] = ~~newValue;
 
         this.setState({}); // update
-
-       //$(React.findDOMNode(this.refs.input)).closest("tr").next().find('.emptyField').select();
     },
 
     /**
@@ -92,10 +93,7 @@ var SDCell = React.createClass({
             requestChange: this.handleChange
         };
 
-        var style = {
-            height: this.props.size,
-            width: this.props.size
-        };
+        var style = {};
 
         // todo: unschön
         if (this.props.info && this.props.info.save && this.props.info.save.cordA == this.props.a && this.props.info.save.cordB == this.props.b) {
@@ -134,23 +132,23 @@ var SDTable = React.createClass({
         var self = this;
 
         return (
-            <table>
-            <tbody>
+            <div className="container-fluid">
+
                 {rows.map(function (eRow, iRow) {
                     return (
-                        <tr key={eRow}>
+                        <div key={eRow} className="row">
                         {columns.map(function (eCol, iCol) {
                             return (
-                                <td key={iCol+eCol}>
+                                <div key={iCol+eCol} className="column">
                                     {self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)}
-                                </td>
+                                </div>
                         );
                         })}
-                        </tr>
+                        </div>
                         );
                 })}
-            </tbody>
-            </table>
+
+            </div>
             );
     }
 });
@@ -263,10 +261,6 @@ var SudokuPlayground = React.createClass({
         });
     },
 
-    size: function () {
-        return ~~((Math.min($(window).width(), $(window).height()) - 200) / 10);
-    },
-
     render: function(){
 
         var valueLink = {
@@ -282,7 +276,7 @@ var SudokuPlayground = React.createClass({
                 <div className="tableContainer">
                     <SDTable rowCount="3" columnCount="3">
                         <SDTable rowCount="3" columnCount="3">
-                            <SDCell size={this.size()} info={this.state.msg} />
+                            <SDCell info={this.state.msg} />
                         </SDTable>
                     </SDTable>
                 </div>
