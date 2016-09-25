@@ -1,35 +1,20 @@
 /**
  * Created by Joerg on 07.06.15.
  */
-import React, { Component } from 'react';
+import React from 'react';
 import solver from './sudoku';
-import ReactDOM from 'react-dom';
 import $ from 'jquery';
-
-
-
-//var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+import Sudokus from '../resources/sudokus.json';
 
 // todo: remove global vars
 
-var s = [
-    [0,0,0,0,0,0,1,0,0],
-    [1,0,0,0,7,0,8,0,0],
-    [5,0,0,0,6,3,0,2,0],
-    [0,7,0,0,0,4,0,0,1],
-    [3,0,0,9,0,7,0,0,4],
-    [4,0,0,8,0,0,0,7,0],
-    [0,1,0,3,5,0,0,0,2],
-    [0,0,2,0,8,0,0,0,5],
-    [0,0,9,0,0,0,0,0,0]
-];
+var s = Sudokus["sudokus"][2].deepClone();;
 
 var initialSudoku = s.deepClone();
 
 var running = false;
 
-
-var StateTwoWayMixin = {
+const StateTwoWayMixin = {
     linkState: function () {
         return {
             value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
@@ -78,7 +63,7 @@ var SDCell = React.createClass({
             else
                 return "initEmpty";
         } else if (!initialSudoku[this.props.a][this.props.b]) {
-            if (s[this.props.a][this.props.b] == 0)
+            if (s[this.props.a][this.props.b] === 0)
                 return "emptyField";
             else
                 return "sdFilled";
@@ -91,7 +76,7 @@ var SDCell = React.createClass({
         var style = {};
 
         // todo: unschön
-        if (this.props.info && this.props.info.save && this.props.info.save.cordA == this.props.a && this.props.info.save.cordB == this.props.b) {
+        if (this.props.info && this.props.info.save && this.props.info.save.cordA === this.props.a && this.props.info.save.cordB === this.props.b) {
             style.background = '#f00';
         }
 
@@ -111,7 +96,7 @@ var SDTable = React.createClass({
 
     renderChildren: function (a,b) {
         return React.Children.map(this.props.children, function (child) {
-            if (child.type == SDCell)
+            if (child.type === SDCell)
                 return React.cloneElement(child, { index:b, a: a, b: b, key: (a + b) });
             else
                 return React.cloneElement(child, { index: b });
@@ -120,10 +105,10 @@ var SDTable = React.createClass({
     render: function () {
         var columns = [];
         var rows = [];
-        for (var i = 0; i < this.props.rowCount; i++)
+        for (let i = 0; i < this.props.rowCount; i++)
             rows.push(i);
 
-        for (var i = 0; i < this.props.columnCount; i++)
+        for (let i = 0; i < this.props.columnCount; i++)
             columns.push(i);
 
         var self = this;
@@ -305,7 +290,5 @@ var App = React.createClass({
             );
     }
 });
-
-//React.render(<SudokuPlayground/>, document.getElementById('playGround'));
 
 export default App;

@@ -14,8 +14,6 @@ Array.prototype.deepClone = function () {
 };
 
 var solver = (function () {
-    'use strict';
-
     // animation timeout
     const TIMEOUT = 10;
 
@@ -62,13 +60,13 @@ var solver = (function () {
         };
     };
 
-    var triggerCallback = function(a) {
+    const triggerCallback = function(a) {
         if (callback instanceof Function && animation) {
             callback(a);
         }
     };
 
-    var check = function (value, a, b) {
+    const check = function (value, a, b) {
 
         for (var j = 0; j < 9; j++) {
 
@@ -99,29 +97,9 @@ var solver = (function () {
     var saveIndex = 0;
     var interval;
 
-    var backtrackHandler = function (runCallback) {
+    const backtrack = function (endEvent) {
 
-        var endEvent = function () {
-            clearInterval(interval);
-            solved = true;
-            runCallback();
-        };
-
-        if (animation) {
-            interval = setInterval(function () {
-                backtrack(endEvent);
-            }, TIMEOUT);
-        } else {
-            while (!solved) {
-                backtrack(endEvent);
-            }
-        }
-    };
-
-    var backtrack = function (endEvent) {
-
-        if (animation)
-            triggerCallback("de");
+        triggerCallback("de");
 
         runs++;
 
@@ -202,12 +180,31 @@ var solver = (function () {
         }
     };
 
+    const backtrackHandler = function (runCallback) {
+
+        var endEvent = function () {
+            clearInterval(interval);
+            solved = true;
+            runCallback();
+        };
+
+        if (animation) {
+            interval = setInterval(function () {
+                backtrack(endEvent);
+            }, TIMEOUT);
+        } else {
+            while (!solved) {
+                backtrack(endEvent);
+            }
+        }
+    };
+
     return {
         /**
          * Sets the initials values of the solver.
-         *
          * @param e Sudoku 2d array
-         * @param ani
+         * @param cb Callback function
+         * @param ani Animation flag
          */
         set: function (e, cb, ani) {
             console.info("Set Sudoku: ", e);
@@ -341,12 +338,6 @@ var solver = (function () {
         getInitialSokudok: function () {
           var s = sudoku.deepClone();
 
-//            s.forEach(function (ele) {
-//                ele.forEach(function (innerEle) {
-//                    innerEle = !!innerEle;
-//                })
-//            });
-
           return s;
         },
 
@@ -389,42 +380,3 @@ var solver = (function () {
 })();
 
 export default solver;
-
-/*solver.set([
-    [0,0,0,0,0,0,1,0,0],
-    [1,0,0,0,7,0,8,0,0],
-    [5,0,0,0,6,3,0,2,0],
-    [0,7,0,0,0,4,0,0,1],
-    [3,0,0,9,0,7,0,0,4],
-    [4,0,0,8,0,0,0,7,0],
-    [0,1,0,3,5,0,0,0,2],
-    [0,0,2,0,8,0,0,0,5],
-    [0,0,9,0,0,0,0,0,0]
-]);*/
-
-/*
-solver.set(    [
-    [0,0,7,3,0,9,0,4,0],
-    [0,0,0,0,0,0,0,0,0],
-    [0,9,0,0,2,8,0,0,7],
-    [0,5,0,0,7,0,0,0,8],
-    [0,7,0,1,0,0,0,0,3],
-    [3,0,0,0,0,2,0,0,1],
-    [0,0,0,5,6,4,0,0,0],
-    [4,0,0,7,0,1,3,9,0],
-    [0,0,0,0,0,0,2,5,0]
-]);*/
-
-/*solver.set(
- [
- [0,6,0,7,0,0,0,2,0],
- [1,0,0,0,0,0,0,0,0],
- [0,8,0,0,0,5,0,0,0],
- [0,0,0,0,0,4,3,1,0],
- [8,1,0,5,0,9,0,7,6],
- [0,7,3,0,6,0,0,0,0],
- [0,0,7,8,0,0,0,3,0],
- [0,0,0,0,0,0,0,0,4],
- [0,3,0,0,0,2,0,9,0]
- ]
- );*/

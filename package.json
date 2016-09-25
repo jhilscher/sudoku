@@ -1,10 +1,11 @@
 {
   "name": "sudoku",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "private": false,
   "homepage": "https://jhilscher.github.io/sudoku",
   "devDependencies": {
-    "react-scripts": "0.4.3"
+    "react-scripts": "0.4.3",
+    "react-test-renderer": "^15.3.2"
   },
   "dependencies": {
     "jquery": "^3.1.0",
