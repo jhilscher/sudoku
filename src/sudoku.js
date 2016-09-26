@@ -71,14 +71,14 @@ var solver = (function () {
         for (var j = 0; j < 9; j++) {
 
             // Quadrat
-            if (sudoku[a][j] == value && b !== j) {
+            if (sudoku[a][j] === value && b !== j) {
                 return false;
             }
 
             // Reihe
             var x = ~~(a/3) * 3 + ~~(j/3);
             var y = ~~(b/3) * 3 + (j%3);
-            if ((x != a || y != b) && sudoku[x][y] === value) {
+            if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
 

@@ -159,6 +159,23 @@ var InfoBox = React.createClass({
 
 });
 
+var Sudoku = React.createClass({
+    render: function(){
+
+        var rowAndColumnSize = Math.sqrt(this.props.size);
+
+        return (
+            <div className="tableContainer">
+                <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
+                    <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
+                        <SDCell info={this.props.msg} />
+                    </SDTable>
+                </SDTable>
+            </div>
+            );
+    }
+});
+
 /**
  * Complete Sudoku component.
  * @type {*}
@@ -253,13 +270,8 @@ var App = React.createClass({
             <div className="jumbotron">
                 { this.state.showResults ?  <InfoBox msg={this.state.msg} /> : null }
 
-                <div className="tableContainer">
-                    <SDTable rowCount="3" columnCount="3">
-                        <SDTable rowCount="3" columnCount="3">
-                            <SDCell info={this.state.msg} />
-                        </SDTable>
-                    </SDTable>
-                </div>
+                <Sudoku size="9" msg={this.state.msg} />
+
                 <div className="btn-toolbar row-fluid">
                     <button type="button" className="btn btn-default" data-toggle="button" onClick={this.onChange} aria-pressed="false" autoComplete="off">
                     Animation
