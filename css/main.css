@@ -83,8 +83,6 @@
 .column input[type="number"] {
     border: 0px;
     text-align: center;
-    width: 9vmin;
-    height: 9vmin;
 }
 
 input::-webkit-outer-spin-button,

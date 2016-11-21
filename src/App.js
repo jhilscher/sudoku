@@ -8,7 +8,7 @@ import Sudokus from '../resources/sudokus.json';
 
 // todo: remove global vars
 
-var s = Sudokus["sudokus"][2].deepClone();;
+var s = Sudokus["sudokus"][2].deepClone();
 
 var initialSudoku = s.deepClone();
 
@@ -40,9 +40,6 @@ var SDCell = React.createClass({
 
     mixins: [StateTwoWayMixin],
 
-    componentDidMount: function () {
-    },
-
     getInitialState: function() {
         return {
             initValue: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: ''
@@ -73,7 +70,10 @@ var SDCell = React.createClass({
     render: function () {
 
 
-        var style = {};
+        var style = {
+            width: this.props.width + "vmin",
+            height: this.props.width + "vmin"
+        };
 
         // todo: unschön
         if (this.props.info && this.props.info.save && this.props.info.save.cordA === this.props.a && this.props.info.save.cordB === this.props.b) {
@@ -103,8 +103,10 @@ var SDTable = React.createClass({
         })
     },
     render: function () {
+        
         var columns = [];
         var rows = [];
+
         for (let i = 0; i < this.props.rowCount; i++)
             rows.push(i);
 
@@ -160,15 +162,21 @@ var InfoBox = React.createClass({
 });
 
 var Sudoku = React.createClass({
+
+    getInitialState: function() {
+        return {};
+    },
+
     render: function(){
 
         var rowAndColumnSize = Math.sqrt(this.props.size);
+        var width = ~~(70 / this.props.size); 
 
         return (
             <div className="tableContainer">
                 <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
                     <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
-                        <SDCell info={this.props.msg} />
+                        <SDCell info={this.props.msg} width={width} />
                     </SDTable>
                 </SDTable>
             </div>
@@ -225,13 +233,43 @@ var App = React.createClass({
         this.setState({isChecked: !this.state.isChecked});
     },
 
+    onSizeChange: function(event) {
+        this.setState({size: event.target.value});
+
+        if (event.target.value == 25){
+            s = Sudokus["sudokus"][3].deepClone();
+            initialSudoku = s.deepClone();
+        } else if (event.target.value == 16){
+            s = Sudokus["sudokus"][4].deepClone();
+            initialSudoku = s.deepClone();
+        } else if (event.target.value == 4){
+            s = Sudokus["sudokus"][5].deepClone();
+            initialSudoku = s.deepClone();
+        }else if (event.target.value == 9){
+            s = Sudokus["sudokus"][2].deepClone();
+            initialSudoku = s.deepClone();
+        }
+
+        solver.set(s, this.update, this.state.isChecked);
+    },
+
+    handleChange: function(event) {
+
+        var newValue = event.target.value;
+
+        this.setState({
+            sudokuAsString: newValue
+        });
+    },
+
     getInitialState: function(){
         return {
             isChecked: false,
             sudokuAsString: "",
             initialSudoku: [],
             showResults: false,
-            msg: null
+            msg: null,
+            size: 9
         };
     },
 
@@ -254,15 +292,6 @@ var App = React.createClass({
         }
     },
 
-    handleChange: function(event) {
-
-        var newValue = event.target.value;
-
-        this.setState({
-            sudokuAsString: newValue
-        });
-    },
-
     render: function(){
 
         return (
@@ -270,14 +299,21 @@ var App = React.createClass({
             <div className="jumbotron">
                 { this.state.showResults ?  <InfoBox msg={this.state.msg} /> : null }
 
-                <Sudoku size="9" msg={this.state.msg} />
+                <Sudoku msg={this.state.msg} size={this.state.size} />
 
-                <div className="btn-toolbar row-fluid">
+                <div className="btn-toolbar row-fluid form-inline">
+                    <select className="form-control" defaultValue={this.state.size} onChange={this.onSizeChange}>
+                        <option value="4">4x4</option>
+                        <option value="9">9x9</option>
+                        <option value="16">16x16</option>
+                        <option value="25">25x25</option>
+                    </select>
                     <button type="button" className="btn btn-default" data-toggle="button" onClick={this.onChange} aria-pressed="false" autoComplete="off">
                     Animation
                     </button>
                     <button type="button" className="btn btn-default" onClick={this.clear}>Clear</button>
                     <button type="button" className="btn btn-primary" onClick={this.solve}>Solve</button>
+                    
                 </div>
             </div>
 

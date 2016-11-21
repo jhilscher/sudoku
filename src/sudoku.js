@@ -14,10 +14,15 @@ Array.prototype.deepClone = function () {
 };
 
 var solver = (function () {
-    // animation timeout
+
+    // animation timeout in ms
     const TIMEOUT = 10;
 
-    var openFields = 81;
+    var sudokuSize;
+
+    var boxSize;
+
+    var openFields;
 
     var solved = false, hardmode = false, runs = 0;
 
@@ -68,7 +73,7 @@ var solver = (function () {
 
     const check = function (value, a, b) {
 
-        for (var j = 0; j < 9; j++) {
+        for (var j = 0; j < sudokuSize; j++) {
 
             // Quadrat
             if (sudoku[a][j] === value && b !== j) {
@@ -76,15 +81,15 @@ var solver = (function () {
             }
 
             // Reihe
-            var x = ~~(a/3) * 3 + ~~(j/3);
-            var y = ~~(b/3) * 3 + (j%3);
+            var x = ~~(a/boxSize) * boxSize + ~~(j/boxSize);
+            var y = ~~(b/boxSize) * boxSize + (j%boxSize);
             if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
 
             // Spalte
-            x = (a%3) + ~~(j/3) * 3;
-            y = (b%3) + (j%3) * 3;
+            x = (a%boxSize) + ~~(j/boxSize) * boxSize;
+            y = (b%boxSize) + (j%boxSize) * boxSize;
             if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
@@ -99,19 +104,21 @@ var solver = (function () {
 
     const backtrack = function (endEvent) {
 
-        triggerCallback("de");
+        if (animation)
+            triggerCallback("de");
 
         runs++;
 
 
         // fallback exit . todo: remove
-        if (runs > 500000) {
+        if (runs > 500000000) {
             endEvent();
             return;
+        } else if (runs % 100000 === 0) {
+            console.info('Runs: %d', runs);
         }
 
         if (stackIndex < 0 || stackIndex >= stack.length) {
-            stackIndex = 0;
             endEvent();
             return;
         }
@@ -193,9 +200,14 @@ var solver = (function () {
                 backtrack(endEvent);
             }, TIMEOUT);
         } else {
-            while (!solved) {
-                backtrack(endEvent);
-            }
+            setImmediate(() => {
+                while (!solved) {
+                    backtrack(endEvent);
+                }
+            });
+            // interval = setInterval(function () {
+            //     backtrack(endEvent);
+            // });
         }
     };
 
@@ -213,12 +225,16 @@ var solver = (function () {
             runs = 0;
             solved = false;
             sudoku = e;
-            openFields = 81;
+            sudokuSize = e.length;
+            openFields = sudokuSize * sudokuSize;
+            boxSize = Math.sqrt(sudokuSize);
             hardmode = false;
             stack = [];
             stackIndex = 0;
             saveIndex = 0;
             errors = '';
+
+            console.info('Size, BoxSize, Open:', sudokuSize, boxSize, openFields);
         },
 
         /**
@@ -243,7 +259,7 @@ var solver = (function () {
 
                     if (sudoku[i][j] === 0) {
 
-                        for (var k = 1; k <= 9; k++) {
+                        for (var k = 1; k <= sudokuSize; k++) {
                             if (check(k, i, j)) {
                                 saved++;
                                 index = k;
@@ -281,7 +297,7 @@ var solver = (function () {
             }
 
             if (openFields === 0)
-                return true;
+                return true; 
         },
 
         /**
@@ -300,13 +316,10 @@ var solver = (function () {
 
             console.info("Loading sudoku from String", s, arr.length);
 
-            if (arr.length !== 81)
-                return false;
-
             var res = [];
 
             while(arr[0] != undefined) {
-                res.push(arr.splice(0,9));
+                res.push(arr.splice(0,sudokuSize));
             }
 
             return res;
@@ -336,9 +349,7 @@ var solver = (function () {
         },
 
         getInitialSokudok: function () {
-          var s = sudoku.deepClone();
-
-          return s;
+          return sudoku.deepClone();
         },
 
         /**
@@ -355,12 +366,19 @@ var solver = (function () {
 
             try {
                 if (!this.solve()) {
-                    backtrackHandler(function () {
+
+                    //stack = stack.sort((a, b) => a.possibleValues.length < b.possibleValues.length); 
+                    
+                    backtrackHandler(() => {
                         elapsedTime = new Date() - d;
                         console.info("Solved in %d ms.", elapsedTime);
                         runCallback(new Msg(success, runs, elapsedTime, errors));
                     });
+
+                } else {
+                    runCallback(new Msg(success, runs, elapsedTime, errors));
                 }
+                
              } catch (e) {
                 console.error(e.toString());
                 runCallback(e);
