@@ -1,5 +1,6 @@
 .idea/
 .vscode/
 .git/
+.chrome/
 bootstrap/
 node_modules/

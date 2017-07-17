@@ -4,11 +4,12 @@
 import React from 'react';
 import solver from './sudoku';
 import $ from 'jquery';
-import Sudokus from '../resources/sudokus.json';
+import Sudokus from './resources/sudokus.json';
+import createReactClass from 'create-react-class';
 
 // todo: remove global vars
 
-var s = Sudokus["sudokus"][2].deepClone();
+var s = Sudokus["sudokus"][8].deepClone();
 
 var initialSudoku = s.deepClone();
 
@@ -36,7 +37,7 @@ const StateTwoWayMixin = {
  * Cell of the Sudoku Table.
  * @type {*}
  */
-var SDCell = React.createClass({
+var SDCell = createReactClass({
 
     mixins: [StateTwoWayMixin],
 
@@ -92,7 +93,7 @@ var SDCell = React.createClass({
  * Table elements, represents a html-table.
  * @type {*}
  */
-var SDTable = React.createClass({
+var SDTable = createReactClass({
 
     renderChildren: function (a,b) {
         return React.Children.map(this.props.children, function (child) {
@@ -141,7 +142,7 @@ var SDTable = React.createClass({
  * Alert-Box that handles messages from the sudoku.js.
  * @type {*}
  */
-var InfoBox = React.createClass({
+var InfoBox = createReactClass({
     render: function () {
 
         var text = this.props.msg.toString();
@@ -161,7 +162,7 @@ var InfoBox = React.createClass({
 
 });
 
-var Sudoku = React.createClass({
+var Sudoku = createReactClass({
 
     getInitialState: function() {
         return {};
@@ -188,7 +189,7 @@ var Sudoku = React.createClass({
  * Complete Sudoku component.
  * @type {*}
  */
-var App = React.createClass({
+var App = createReactClass({
 
     clear: function() {
         s.forEach(function(arr, a) {
@@ -245,8 +246,8 @@ var App = React.createClass({
         } else if (event.target.value == 4){
             s = Sudokus["sudokus"][5].deepClone();
             initialSudoku = s.deepClone();
-        }else if (event.target.value == 9){
-            s = Sudokus["sudokus"][2].deepClone();
+        } else if (event.target.value == 9){
+            s = Sudokus["sudokus"][8].deepClone();
             initialSudoku = s.deepClone();
         }
 

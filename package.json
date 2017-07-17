@@ -4,13 +4,14 @@
   "private": false,
   "homepage": "https://jhilscher.github.io/sudoku",
   "devDependencies": {
-    "react-scripts": "0.4.3",
+    "react-scripts": "1.0.10",
     "react-test-renderer": "^15.3.2"
   },
   "dependencies": {
     "jquery": "^3.1.0",
-    "react": "^15.3.1",
-    "react-dom": "^15.3.1"
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "create-react-class" : "^15.6.0"
   },
   "scripts": {
     "start": "react-scripts start",

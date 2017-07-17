@@ -55,13 +55,19 @@ var solver = (function () {
         };
     };
 
-    var Save = function(a, b, s, v) {
+    /**
+     * Saved values node in stack.
+     *
+     * @param {Number} cordA 
+     * @param {Number} cordB 
+     * @param {Array} values 
+     */
+    var Save = function(cordA, cordB, values) {
         return {
-            cordA: a,
-            cordB: b,
-            saved: s,
-            possibleValues: v,
-            index: 0
+            cordA: cordA,
+            cordB: cordB,
+            possibleValues: values,
+            index: -1
         };
     };
 
@@ -73,23 +79,25 @@ var solver = (function () {
 
     const check = function (value, a, b) {
 
-        for (var j = 0; j < sudokuSize; j++) {
+        for (var i = 0; i < sudokuSize; i++) {
 
-            // Quadrat
-            if (sudoku[a][j] === value && b !== j) {
+            // Square
+            if (sudoku[a][i] === value && b !== i) {
                 return false;
             }
 
-            // Reihe
-            var x = ~~(a/boxSize) * boxSize + ~~(j/boxSize);
-            var y = ~~(b/boxSize) * boxSize + (j%boxSize);
+            // Row
+            var x = ~~(a / boxSize) * boxSize + ~~(i / boxSize);
+            var y = ~~(b / boxSize) * boxSize + (i % boxSize);
+
             if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
 
-            // Spalte
-            x = (a%boxSize) + ~~(j/boxSize) * boxSize;
-            y = (b%boxSize) + (j%boxSize) * boxSize;
+            // Column
+            x = (a % boxSize) + ~~(i / boxSize) * boxSize;
+            y = (b % boxSize) + (i % boxSize) * boxSize;
+
             if ((x !== a || y !== b) && sudoku[x][y] === value) {
                 return false;
             }
@@ -98,94 +106,68 @@ var solver = (function () {
         return true;
     };
 
+    const checkPosibleValues = function (curSave) {
+        for (let j = saveIndex; j < curSave.possibleValues.length; j++) {
+
+            let value = curSave.possibleValues[j];
+
+            if (check(value, curSave.cordA, curSave.cordB)) {
+                sudoku[curSave.cordA][curSave.cordB] = value;
+                curSave.index = j;
+                //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    const reduceStackIndex = function() {
+        stackIndex--;
+
+        if (stackIndex < 0)
+            throw new Msg(false, runs, null, 'not solvable', null);
+
+        let tmp = stack[stackIndex];   
+
+        saveIndex = tmp.index + 1;
+
+        sudoku[tmp.cordA][tmp.cordB] = 0;
+    };
+
     var stackIndex = 0;
     var saveIndex = 0;
     var interval;
 
     const backtrack = function (endEvent) {
 
-        if (animation)
-            triggerCallback("de");
-
         runs++;
 
+        if (!checkPosibleValues(stack[stackIndex])) {
+            
+            reduceStackIndex();
 
-        // fallback exit . todo: remove
-        if (runs > 500000000) {
-            endEvent();
-            return;
-        } else if (runs % 100000 === 0) {
-            console.info('Runs: %d', runs);
-        }
-
-        if (stackIndex < 0 || stackIndex >= stack.length) {
-            endEvent();
-            return;
-        }
-
-        var assignFirst = stack[stackIndex];
-
-        if (assignFirst.possibleValues.length <= saveIndex ){
-            if (stackIndex > 1) {
-                stackIndex--;
-                saveIndex = stack[stackIndex].index + 1;
-                //console.info("Reduce Index! Stackindex: %d SaveIndex: %d", stackIndex, saveIndex);
-                return;
+            while (stack[stackIndex].possibleValues.length <= saveIndex) {
+                reduceStackIndex();
             }
-            else {
-                throw new Msg(false, runs, null, 'not solvable', stack[stackIndex]);
-            }
-        }
 
-        for (var h = stackIndex; h < stack.length; h++) {
-            var tmp = stack[h];
-            sudoku[tmp.cordA][tmp.cordB] = 0;
-        }
-
-        if (check(assignFirst.possibleValues[saveIndex], assignFirst.cordA, assignFirst.cordB)) {
-            assignFirst.index = saveIndex;
-            sudoku[assignFirst.cordA][assignFirst.cordB] = assignFirst.possibleValues[saveIndex];
         } else {
-            saveIndex++;
-            return;
+            saveIndex = 0;
+            stackIndex++;
         }
 
-        for (var i = stackIndex + 1; i < stack.length; i++) {
+        if (animation)
+            triggerCallback("de: " + runs);
 
-            var curSave = stack[i];
-
-            var correct = false;
-
-            for (var j = 0; j < curSave.possibleValues.length; j++ ) {
-
-                var value = curSave.possibleValues[j];
-
-                var checked = check(value, curSave.cordA, curSave.cordB);
-
-                correct |= checked;
-
-                if (checked) {
-                    sudoku[curSave.cordA][curSave.cordB] = value;
-                    curSave.index = j;
-                    //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
-                    break;
-                }
-            }
-
-            if (!correct) {
-                stackIndex = i - 1;
-                saveIndex = stack[stackIndex].index + 1;
-                break;
-            }
-
-            if (correct && i == stack.length - 1) {
-                console.info("SOLVED! in %d runs.", runs);
-                endEvent();
-                triggerCallback("SOLVED");
-                return;
-            }
+        if (stackIndex >= stack.length) {
+            console.info("SOLVED! in %d runs.", runs);
+            endEvent();
+            triggerCallback("SOLVED");
         }
     };
+
+
+
 
     const backtrackHandler = function (runCallback) {
 
@@ -195,19 +177,26 @@ var solver = (function () {
             runCallback();
         };
 
+        function runBacktracking() {
+            return new Promise((resolve, reject) => {
+
+                while (stackIndex < stack.length) {
+                    backtrack(endEvent);
+                }
+
+                if (solved)
+                    resolve();
+            });
+        }
+
         if (animation) {
-            interval = setInterval(function () {
+            interval = setInterval(() => {
                 backtrack(endEvent);
             }, TIMEOUT);
         } else {
-            setImmediate(() => {
-                while (!solved) {
-                    backtrack(endEvent);
-                }
+            runBacktracking().catch((e) => {
+                throw e;
             });
-            // interval = setInterval(function () {
-            //     backtrack(endEvent);
-            // });
         }
     };
 
@@ -274,7 +263,7 @@ var solver = (function () {
                             openFields--;
                         }
                         else if (hardmode) {
-                            stack.push(new Save(i, j, saved, possibleValues));
+                            stack.push(new Save(i, j, possibleValues));
                         }
 
                     } else if (!check(sudoku[i][j], i, j)){
@@ -308,21 +297,7 @@ var solver = (function () {
          */
         getSudokuFromString: function (s) {
 
-            var arr = s.split(',');
-
-            arr = arr.map(function (ele) {
-                return parseInt(ele, 10);
-            });
-
-            console.info("Loading sudoku from String", s, arr.length);
-
-            var res = [];
-
-            while(arr[0] != undefined) {
-                res.push(arr.splice(0,sudokuSize));
-            }
-
-            return res;
+            return JSON.parse(s);
         },
 
         /**
@@ -335,17 +310,7 @@ var solver = (function () {
             if (!sudoku)
                 return "";
 
-            var a = sudoku.reduce(function(previousValue, currentValue) {
-                var b = currentValue.reduce(function(previousValue2, currentValue2) {
-                    return previousValue2 + "," + currentValue2;
-                });
-                return previousValue + "," + b;
-            });
-
-            console.log(a, a.length);
-
-            return a;
-
+            return JSON.stringify(sudoku);
         },
 
         getInitialSokudok: function () {
@@ -364,10 +329,41 @@ var solver = (function () {
             var elapsedTime = 0;
 
 
+
             try {
                 if (!this.solve()) {
 
-                    //stack = stack.sort((a, b) => a.possibleValues.length < b.possibleValues.length); 
+                    var cordAList = [];
+                    var cordBList = [];
+
+                    stack.forEach(function(element) {
+                        if (!cordAList[element.cordA])
+                            cordAList[element.cordA] = 0;
+
+                        if (!cordBList[element.cordB])
+                            cordBList[element.cordB] = 0;
+
+                        cordAList[element.cordA]++;
+                        cordBList[element.cordB]++;
+                    });
+
+                    cordAList.sort((a,b) => a - b);
+                    cordBList.sort((a,b) => a - b);    
+
+                    stack.sort((a, b) => {
+                        
+                        if (cordAList[a.cordA] < cordAList[b.cordA])
+                            return -1;
+                        if (cordAList[a.cordA] > cordAList[b.cordA])
+                            return 1;
+                            
+                        if (a.possibleValues.length < b.possibleValues.length)
+                            return -1;
+                        if (a.possibleValues.length > b.possibleValues.length)
+                            return 1;
+
+                        return  ((a.cordB % boxSize) * ~~(a.cordA / boxSize)) - ((b.cordB % boxSize) * ~~(b.cordA / boxSize));
+                    }); 
                     
                     backtrackHandler(() => {
                         elapsedTime = new Date() - d;
@@ -396,5 +392,10 @@ var solver = (function () {
 
     };
 })();
+
+class _Solver {
+
+}
+
 
 export default solver;
