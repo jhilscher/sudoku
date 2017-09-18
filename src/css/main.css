@@ -1,3 +1,10 @@
+body {
+    font-family: 'Roboto';
+}
+
+.sudokuContainer {
+    background: #eee;
+}
 
 .emptyField input {
     background: #fff;
@@ -33,7 +40,6 @@
 
 .tableContainer {
     margin:0 auto 15px;
-    border-radius: 10px;
 }
 
 .column {

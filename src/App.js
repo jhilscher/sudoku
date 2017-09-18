@@ -7,9 +7,23 @@ import $ from 'jquery';
 import Sudokus from './resources/sudokus.json';
 import createReactClass from 'create-react-class';
 
+// Material UI
+import Icon from 'material-ui/Icon';
+import PropTypes from 'prop-types';
+import Snackbar from 'material-ui/Snackbar';
+import withStyles from 'material-ui/styles/withStyles';
+import { FormControl, FormControlLabel } from 'material-ui/Form';
+import Button from 'material-ui/Button';
+import Switch from 'material-ui/Switch';
+import Menu, { MenuItem } from 'material-ui/Menu';
+import Toolbar from 'material-ui/Toolbar';
+import Input, { InputLabel } from 'material-ui/Input';
+import Select from 'material-ui/Select';
+import IconButton from 'material-ui/IconButton';
+import Grid from 'material-ui/Grid';
 // todo: remove global vars
 
-var s = Sudokus["sudokus"][8].deepClone();
+var s = Sudokus.sudokus[0].data.deepClone();
 
 var initialSudoku = s.deepClone();
 
@@ -18,16 +32,16 @@ var running = false;
 const StateTwoWayMixin = {
     linkState: function () {
         return {
-            value: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: '',
+            value: s[this.props.a][this.props.b] > 0 ? s[this.props.a][this.props.b] : '',
             onChange: function (event) {
                 var newValue = event.target.value;
 
-                if(isNaN(newValue)) // only numbers allowed
+                if (isNaN(newValue)) // only numbers allowed
                     return false;
 
                 s[this.props.a][this.props.b] = ~~newValue;
 
-                this.setState({initValue: newValue});
+                this.setState({ initValue: newValue });
             }.bind(this)
         }
     }
@@ -41,16 +55,16 @@ var SDCell = createReactClass({
 
     mixins: [StateTwoWayMixin],
 
-    getInitialState: function() {
+    getInitialState: function () {
         return {
-            initValue: s[this.props.a][this.props.b] > 0? s[this.props.a][this.props.b]: ''
+            initValue: s[this.props.a][this.props.b] > 0 ? s[this.props.a][this.props.b] : ''
         };
     },
 
     /**
      * Selects all of this input field.
      */
-    selectAll: function() {
+    selectAll: function () {
         $(this.refs.input).select();
     },
 
@@ -83,9 +97,9 @@ var SDCell = createReactClass({
 
         return (
             <div className={this.getClassName()}>
-                <input ref="input" style={style} value={this.state.initValue} {...this.linkState()} onClick={this.selectAll}  maxLength="1" size="1" type="number" />
+                <input ref="input" style={style} value={this.state.initValue} {...this.linkState() } onClick={this.selectAll} maxLength="1" size="1" type="number" />
             </div>
-            );
+        );
     }
 });
 
@@ -95,16 +109,16 @@ var SDCell = createReactClass({
  */
 var SDTable = createReactClass({
 
-    renderChildren: function (a,b) {
+    renderChildren: function (a, b) {
         return React.Children.map(this.props.children, function (child) {
             if (child.type === SDCell)
-                return React.cloneElement(child, { index:b, a: a, b: b, key: (a + b) });
+                return React.cloneElement(child, { index: b, a: a, b: b, key: (a + b) });
             else
                 return React.cloneElement(child, { index: b });
         })
     },
     render: function () {
-        
+
         var columns = [];
         var rows = [];
 
@@ -122,56 +136,132 @@ var SDTable = createReactClass({
                 {rows.map(function (eRow, iRow) {
                     return (
                         <div key={eRow} className="row">
-                        {columns.map(function (eCol, iCol) {
-                            return (
-                                <div key={iCol+eCol} className="column">
-                                    {self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)}
-                                </div>
-                        );
-                        })}
+                            {columns.map(function (eCol, iCol) {
+                                return (
+                                    <div key={iCol + eCol} className="column">
+                                        {self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)}
+                                    </div>
+                                );
+                            })}
                         </div>
-                        );
+                    );
                 })}
 
             </div>
-            );
+        );
     }
 });
+
+/**
+ * Selection for elements of itemList.
+ */
+class SudokuDropDown extends React.Component {
+    state = {
+        selectedIndex: 0,
+        selectedItem: this.props.itemList.sudokus[0]
+    };
+
+    handleClickListItem = (event) => {
+        this.setState({
+            selectedIndex: event.target.index,
+            selectedItem: event.target.value
+        });
+        this.props.onChange(event, event.target.index, event.target.value);
+    };
+
+    render() {
+        return (
+            <div>
+                <FormControl>
+                    <InputLabel htmlFor="dropdown">Sudoku</InputLabel>
+                    <Select
+                        value={this.state.selectedItem}
+                        onChange={this.handleClickListItem}
+                        input={<Input id="dropdown" />}
+                    >
+                        {this.props.itemList.sudokus.map((sudoku, index) => (
+                            <MenuItem
+                                key={sudoku.title}
+                                value={sudoku}
+                            >
+                                {sudoku.title}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+            </div>
+        );
+    }
+}
+
 
 /**
  * Alert-Box that handles messages from the sudoku.js.
  * @type {*}
  */
-var InfoBox = createReactClass({
-    render: function () {
+class InfoBox extends React.Component {
 
-        var text = this.props.msg.toString();
+    state = {
+        open: this.props.open
+    };
 
-        var classes = 'alert ';
+    componentWillReceiveProps(nextProps) {
+        this.setState({ open: nextProps.open });
+    }
 
-        if (this.props.msg.success) {
-            classes += 'alert-info';
-        } else {
-            classes += 'alert-danger';
+    handleRequestClose = (event, reason) => {
+        this.setState({ open: false });
+        this.props.onClose(event);
+    };
+
+    render() {
+        var text = this.props.msg ? this.props.msg.toString() : null;
+
+        if (this.props.msg) {
+
+            var classes = 'alert ';
+
+            if (this.props.msg.success) {
+                classes += 'alert-info';
+            } else {
+                classes += 'alert-danger';
+            }
         }
 
         return (
-            <div className={classes} role="alert">{text}</div>
-            );
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={this.state.open}
+                onRequestClose={this.handleRequestClose}
+                SnackbarContentProps={{
+                    'aria-describedby': 'message-id'
+                }}
+                message={<span id="message-id">{text}</span>}
+                action={
+                    <IconButton
+                        key="close"
+                        aria-label="Close"
+                        color="inherit"
+                        onClick={this.handleRequestClose}>
+                        <Icon color="accent">close</Icon>
+                    </IconButton>
+                }
+            />
+        );
     }
-
-});
+};
 
 var Sudoku = createReactClass({
 
-    getInitialState: function() {
+    getInitialState: function () {
         return {};
     },
 
-    render: function(){
+    render: function () {
 
         var rowAndColumnSize = Math.sqrt(this.props.size);
-        var width = ~~(70 / this.props.size); 
+        var width = ~~(70 / this.props.size);
 
         return (
             <div className="tableContainer">
@@ -181,7 +271,7 @@ var Sudoku = createReactClass({
                     </SDTable>
                 </SDTable>
             </div>
-            );
+        );
     }
 });
 
@@ -191,16 +281,17 @@ var Sudoku = createReactClass({
  */
 var App = createReactClass({
 
-    clear: function() {
-        s.forEach(function(arr, a) {
-            arr.forEach(function(ele, b) {
+    clear: function () {
+        s.forEach(function (arr, a) {
+            arr.forEach(function (ele, b) {
                 s[a][b] = 0;
                 initialSudoku[a][b] = 0;
             });
         });
         this.setState({
             showResults: false,
-            msg: null});
+            msg: null
+        });
     },
 
     update: function (args) {
@@ -210,19 +301,20 @@ var App = createReactClass({
 
     componentDidMount: function () {
         solver.set(s, this.update, this.state.isChecked);
-        initialSudoku = solver.getInitialSokudok();
+        initialSudoku = solver.getInitialSudoku();
     },
 
-    solve: function(){
+    solve: function () {
         running = true;
 
         solver.set(s, this.update, this.state.isChecked);
-        initialSudoku = solver.getInitialSokudok();
+        initialSudoku = solver.getInitialSudoku();
 
         var success = function (msg) {
             this.setState({
                 showResults: true,
-                msg: msg});
+                msg: msg
+            });
         };
         var successCallback = success.bind(this);
 
@@ -231,30 +323,31 @@ var App = createReactClass({
     },
 
     onChange: function () {
-        this.setState({isChecked: !this.state.isChecked});
+        this.setState({ isChecked: !this.state.isChecked });
     },
 
-    onSizeChange: function(event) {
-        this.setState({size: event.target.value});
+    onSizeChange: function (event, index, value) {
 
-        if (event.target.value == 25){
-            s = Sudokus["sudokus"][3].deepClone();
-            initialSudoku = s.deepClone();
-        } else if (event.target.value == 16){
-            s = Sudokus["sudokus"][4].deepClone();
-            initialSudoku = s.deepClone();
-        } else if (event.target.value == 4){
-            s = Sudokus["sudokus"][5].deepClone();
-            initialSudoku = s.deepClone();
-        } else if (event.target.value == 9){
-            s = Sudokus["sudokus"][8].deepClone();
-            initialSudoku = s.deepClone();
-        }
+        s = value.data.deepClone();
+
+        this.setState({
+            size: s.length,
+            selectedSudoku: value,
+            showResults: false
+        });
+
+        initialSudoku = s.deepClone();
 
         solver.set(s, this.update, this.state.isChecked);
     },
 
-    handleChange: function(event) {
+    onInfoBoxClose: function(event) {
+        this.setState({
+            showResults: false
+        });
+    },
+
+    handleChange: function (event) {
 
         var newValue = event.target.value;
 
@@ -263,19 +356,20 @@ var App = createReactClass({
         });
     },
 
-    getInitialState: function(){
+    getInitialState: function () {
         return {
             isChecked: false,
             sudokuAsString: "",
             initialSudoku: [],
             showResults: false,
             msg: null,
-            size: 9
+            size: 9,
+            selectedSudoku: 91
         };
     },
 
     getAsString: function () {
-        this.setState({sudokuAsString: solver.print()});
+        this.setState({ sudokuAsString: solver.print() });
     },
 
     setFromString: function () {
@@ -283,61 +377,85 @@ var App = createReactClass({
         if (this.state.sudokuAsString) {
             s = solver.getSudokuFromString(this.state.sudokuAsString);
             solver.set(s, this.update, this.state.isChecked);
-            initialSudoku = solver.getInitialSokudok();
+            initialSudoku = solver.getInitialSudoku();
             console.log(s);
             running = false;
 
             this.setState({
                 showResults: false,
-                msg: null});
+                msg: null
+            });
         }
     },
 
-    render: function(){
+    render: function () {
 
         return (
             <div>
-            <div className="jumbotron">
-                { this.state.showResults ?  <InfoBox msg={this.state.msg} /> : null }
-
-                <Sudoku msg={this.state.msg} size={this.state.size} />
-
-                <div className="btn-toolbar row-fluid form-inline">
-                    <select className="form-control" defaultValue={this.state.size} onChange={this.onSizeChange}>
-                        <option value="4">4x4</option>
-                        <option value="9">9x9</option>
-                        <option value="16">16x16</option>
-                        <option value="25">25x25</option>
-                    </select>
-                    <button type="button" className="btn btn-default" data-toggle="button" onClick={this.onChange} aria-pressed="false" autoComplete="off">
-                    Animation
-                    </button>
-                    <button type="button" className="btn btn-default" onClick={this.clear}>Clear</button>
-                    <button type="button" className="btn btn-primary" onClick={this.solve}>Solve</button>
-                    
+                <div className="sudokuContainer">
+                    <InfoBox msg={this.state.msg} open={this.state.showResults} onClose={this.onInfoBoxClose} />
+                    <Sudoku msg={this.state.msg} size={this.state.size} />
                 </div>
-            </div>
 
-            <div className="panel panel-default">
-                <div className="panel-heading">Settings</div>
-                <div className="panel-body">
-                    <div className="row">
-                        <div className="col-lg-6">
-                            <div className="input-group">
-                                <input type="text" className="form-control" value={this.state.sudokuAsString} onChange={this.handleChange} />
-                                <span className="input-group-btn">
-                                    <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
-                                    <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
-                                </span>
+                <Toolbar>
+                    <Grid container>
+                        <Grid item>
+                            <SudokuDropDown itemList={Sudokus} onChange={this.onSizeChange} />
+                        </Grid>
+                        <Grid item>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={this.state.isChecked}
+                                    onChange={this.onChange}
+                                />
+                            }
+                            label="animation" />
+                        </Grid>
+                        <Grid item>
+                            <Button raised onClick={this.clear}>
+                                <Icon>clear</Icon> Clear
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button raised color="primary" onClick={this.solve}>
+                                <Icon>check</Icon> Solve
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Toolbar>
+
+                <div className="panel panel-default">
+                    <div className="panel-heading">Settings</div>
+                    <div className="panel-body">
+                        <div className="row">
+                            <div className="col-lg-6">
+                                <div className="input-group">
+                                    <input type="text" className="form-control" value={this.state.sudokuAsString} onChange={this.handleChange} />
+                                    <span className="input-group-btn">
+                                        <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
+                                        <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
+                                    </span>
                                 </div>
                             </div>
-                    </div>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-            </div>
-            );
+        );
     }
 });
 
-export default App;
+App.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+
+const styles = {
+    root: {
+        marginTop: 30,
+        width: '100%',
+    },
+};
+
+export default withStyles(styles)(App);

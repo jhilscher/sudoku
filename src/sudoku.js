@@ -79,6 +79,14 @@ var solver = (function () {
 
     const check = function (value, a, b) {
 
+        if (sudoku[a][b] === value)
+            return true;
+
+        if (squareValues[a][value] || 
+            rowValues[~~(a / boxSize) * boxSize + ~~(b/ boxSize)][value] || 
+            columnValues[(b % boxSize) + (a % boxSize) * boxSize][value])
+            return false;
+
         for (var i = 0; i < sudokuSize; i++) {
 
             // Square
@@ -106,13 +114,45 @@ var solver = (function () {
         return true;
     };
 
+
+    const snake = function (curSave) {
+        if (stackIndex > stack.length - 2)
+            return false;
+
+        // swap
+        let a = stack[stackIndex];
+        stack[stackIndex] = stack[stack.length - 1];
+        stack[stack.length - 1] = a;
+
+        saveIndex = 0;
+
+        return true;
+    };
+
+    const updateStack = function () {
+        for (let i = stackIndex + 1; i < stack.length; i++) {
+
+            let stackItem = stack[i];
+
+            var newPossibleValues = [];
+
+            for (let k = 0; k < stackItem.possibleValues.length; k++) {
+                if (check(stackItem.possibleValues[k], stackItem.cordA, stackItem.cordB)) {
+                    newPossibleValues.push(k);
+                }
+            }
+
+            stackItem.possibleValues = newPossibleValues;
+        }
+    };
+
     const checkPosibleValues = function (curSave) {
         for (let j = saveIndex; j < curSave.possibleValues.length; j++) {
 
             let value = curSave.possibleValues[j];
 
             if (check(value, curSave.cordA, curSave.cordB)) {
-                sudoku[curSave.cordA][curSave.cordB] = value;
+                setSudokuValue(value, curSave.cordA, curSave.cordB);
                 curSave.index = j;
                 //console.info("BT cord", i, curSave.cordA, curSave.cordB, value);
                 return true;
@@ -120,6 +160,25 @@ var solver = (function () {
         }
 
         return false;
+    };
+
+    var squareValues;
+    var rowValues;
+    var columnValues;
+
+    const setSudokuValue = function(value, cordA, cordB) {
+
+        let oldValue = sudoku[cordA][cordB];
+
+        squareValues[cordA][oldValue] = false;
+        rowValues[~~(cordA / boxSize) * boxSize + ~~(cordB/ boxSize)][oldValue] = false;
+        columnValues[(cordB % boxSize) + (cordA % boxSize) * boxSize][oldValue] = false;
+
+        sudoku[cordA][cordB] = value;
+
+        squareValues[cordA][value] = true;
+        rowValues[~~(cordA / boxSize) * boxSize + ~~(cordB/ boxSize)][value] = true;
+        columnValues[(cordB % boxSize) + (cordA % boxSize) * boxSize][value] = true;
     };
 
     const reduceStackIndex = function() {
@@ -132,7 +191,7 @@ var solver = (function () {
 
         saveIndex = tmp.index + 1;
 
-        sudoku[tmp.cordA][tmp.cordB] = 0;
+        setSudokuValue(0, tmp.cordA, tmp.cordB);
     };
 
     var stackIndex = 0;
@@ -142,6 +201,7 @@ var solver = (function () {
     const backtrack = function (endEvent) {
 
         runs++;
+        //updateStack();
 
         if (!checkPosibleValues(stack[stackIndex])) {
             
@@ -186,6 +246,8 @@ var solver = (function () {
 
                 if (solved)
                     resolve();
+                else
+                    reject();
             });
         }
 
@@ -195,7 +257,7 @@ var solver = (function () {
             }, TIMEOUT);
         } else {
             runBacktracking().catch((e) => {
-                throw e;
+                runCallback(new Msg(false, runs, null, 'not solvable', null));
             });
         }
     };
@@ -221,6 +283,9 @@ var solver = (function () {
             stack = [];
             stackIndex = 0;
             saveIndex = 0;
+            rowValues = Array.from({ length: sudokuSize }, () => Array.from({ length: sudokuSize + 1}, () => false));
+            columnValues = Array.from({ length: sudokuSize }, () => Array.from({ length: sudokuSize + 1 }, () => false));
+            squareValues = Array.from({ length: sudokuSize }, () => Array.from({ length: sudokuSize + 1}, () => false));
             errors = '';
 
             console.info('Size, BoxSize, Open:', sudokuSize, boxSize, openFields);
@@ -235,18 +300,19 @@ var solver = (function () {
 
             var correction = 0;
 
-            for (var i = 0; i < sudoku.length; i++) {
-                for (var j = 0; j < sudoku[i].length; j++) {
+            for (let i = 0; i < sudoku.length; i++) {
+                for (let j = 0; j < sudoku[i].length; j++) {
 
-                    var saved = 0;
-                    var index = 0;
-                    var possibleValues = [];
+                    let saved = 0;
+                    let index = 0;
+                    let possibleValues = [];
+                    let value = sudoku[i][j];
 
-                    if (sudoku[i][j] !== 0 && runs === 0) {
+                    if (value !== 0 && runs === 0) {
                         openFields--;
                     }
 
-                    if (sudoku[i][j] === 0) {
+                    if (value === 0) {
 
                         for (var k = 1; k <= sudokuSize; k++) {
                             if (check(k, i, j)) {
@@ -258,7 +324,7 @@ var solver = (function () {
 
                         // save move
                         if (saved === 1) {
-                            sudoku[i][j] = index;
+                            setSudokuValue(index, i, j);
                             correction++;
                             openFields--;
                         }
@@ -266,9 +332,13 @@ var solver = (function () {
                             stack.push(new Save(i, j, possibleValues));
                         }
 
-                    } else if (!check(sudoku[i][j], i, j)){
+                    } else if (!check(value, i, j)){
                         throw new Msg(false, runs, null, 'error found in initial sudoku',
                             new Save(i, j, null, possibleValues));
+                    } else {
+                        squareValues[i][value] = true;
+                        rowValues[~~(i / boxSize) * boxSize + ~~(j / boxSize)][value] = true;
+                        columnValues[(j % boxSize) + (i % boxSize) * boxSize][value] = true;
                     }
                 }
             }
@@ -313,7 +383,7 @@ var solver = (function () {
             return JSON.stringify(sudoku);
         },
 
-        getInitialSokudok: function () {
+        getInitialSudoku: function () {
           return sudoku.deepClone();
         },
 
