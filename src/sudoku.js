@@ -79,13 +79,13 @@ var solver = (function () {
 
     const check = function (value, a, b) {
 
-        if (sudoku[a][b] === value)
-            return true;
+        // if (sudoku[a][b] === value)
+        //     return true;
 
-        if (squareValues[a][value] || 
-            rowValues[~~(a / boxSize) * boxSize + ~~(b/ boxSize)][value] || 
-            columnValues[(b % boxSize) + (a % boxSize) * boxSize][value])
-            return false;
+        // if (squareValues[a][value] || 
+        //     rowValues[~~(a / boxSize) * boxSize + ~~(b/ boxSize)][value] || 
+        //     columnValues[(b % boxSize) + (a % boxSize) * boxSize][value])
+        //     return false;
 
         for (var i = 0; i < sudokuSize; i++) {
 

@@ -7,20 +7,26 @@ import $ from 'jquery';
 import Sudokus from './resources/sudokus.json';
 import createReactClass from 'create-react-class';
 
+// Project Components
+import InfoBox from './components/InfoBox';
+
 // Material UI
 import Icon from 'material-ui/Icon';
 import PropTypes from 'prop-types';
-import Snackbar from 'material-ui/Snackbar';
 import withStyles from 'material-ui/styles/withStyles';
 import { FormControl, FormControlLabel } from 'material-ui/Form';
 import Button from 'material-ui/Button';
 import Switch from 'material-ui/Switch';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Input, { InputLabel } from 'material-ui/Input';
 import Select from 'material-ui/Select';
 import IconButton from 'material-ui/IconButton';
 import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
+import TextField from 'material-ui/TextField';
 // todo: remove global vars
 
 var s = Sudokus.sudokus[0].data.deepClone();
@@ -196,62 +202,6 @@ class SudokuDropDown extends React.Component {
 }
 
 
-/**
- * Alert-Box that handles messages from the sudoku.js.
- * @type {*}
- */
-class InfoBox extends React.Component {
-
-    state = {
-        open: this.props.open
-    };
-
-    componentWillReceiveProps(nextProps) {
-        this.setState({ open: nextProps.open });
-    }
-
-    handleRequestClose = (event, reason) => {
-        this.setState({ open: false });
-        this.props.onClose(event);
-    };
-
-    render() {
-        var text = this.props.msg ? this.props.msg.toString() : null;
-
-        if (this.props.msg) {
-
-            var classes = 'alert ';
-
-            if (this.props.msg.success) {
-                classes += 'alert-info';
-            } else {
-                classes += 'alert-danger';
-            }
-        }
-
-        return (
-            <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                open={this.state.open}
-                onRequestClose={this.handleRequestClose}
-                SnackbarContentProps={{
-                    'aria-describedby': 'message-id'
-                }}
-                message={<span id="message-id">{text}</span>}
-                action={
-                    <IconButton
-                        key="close"
-                        aria-label="Close"
-                        color="inherit"
-                        onClick={this.handleRequestClose}>
-                        <Icon color="accent">close</Icon>
-                    </IconButton>
-                }
-            />
-        );
-    }
-};
-
 var Sudoku = createReactClass({
 
     getInitialState: function () {
@@ -341,7 +291,7 @@ var App = createReactClass({
         solver.set(s, this.update, this.state.isChecked);
     },
 
-    onInfoBoxClose: function(event) {
+    onInfoBoxClose: function (event) {
         this.setState({
             showResults: false
         });
@@ -392,56 +342,87 @@ var App = createReactClass({
 
         return (
             <div>
-                <div className="sudokuContainer">
-                    <InfoBox msg={this.state.msg} open={this.state.showResults} onClose={this.onInfoBoxClose} />
-                    <Sudoku msg={this.state.msg} size={this.state.size} />
-                </div>
-
-                <Toolbar>
-                    <Grid container>
+                <header>
+                    <Grid container 
+                        align='flex-end' 
+                        style={{
+                            background: '#fff'
+                        }}>
+                        <Grid item>
+                            <Typography type="headline">
+                                <Icon style={{
+                                    color: '#ccc',
+                                    fontSize: '48px'
+                                }}>border_outer</Icon> Sudoku Solver
+                            </Typography>
+                        </Grid>
                         <Grid item>
                             <SudokuDropDown itemList={Sudokus} onChange={this.onSizeChange} />
                         </Grid>
                         <Grid item>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={this.state.isChecked}
-                                    onChange={this.onChange}
-                                />
-                            }
-                            label="animation" />
-                        </Grid>
-                        <Grid item>
-                            <Button raised onClick={this.clear}>
-                                <Icon>clear</Icon> Clear
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Button raised color="primary" onClick={this.solve}>
-                                <Icon>check</Icon> Solve
-                            </Button>
+                            
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        id='animation-switch'
+                                        checked={this.state.isChecked}
+                                        onChange={this.onChange}
+                                    />
+                                }
+                                label="animation" />
+                            
                         </Grid>
                     </Grid>
-                </Toolbar>
+                </header>
 
-                <div className="panel panel-default">
-                    <div className="panel-heading">Settings</div>
-                    <div className="panel-body">
-                        <div className="row">
-                            <div className="col-lg-6">
-                                <div className="input-group">
-                                    <input type="text" className="form-control" value={this.state.sudokuAsString} onChange={this.handleChange} />
-                                    <span className="input-group-btn">
-                                        <button className="btn btn-default" onClick={this.getAsString} type="button">Get As String.</button>
-                                        <button className="btn btn-default" onClick={this.setFromString} type="button">Set From String.</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                <div className="sudokuContainer">
+                    <InfoBox msg={this.state.msg} open={this.state.showResults} onClose={this.onInfoBoxClose} />
+                    <Sudoku msg={this.state.msg} size={this.state.size} />
                 </div>
+            
+                <Grid container spacing={24} style={{
+                            background: '#eee'
+                        }}>
+                    <Grid item xs={12}>
+                        <Toolbar>
+                            <Grid container spacing={24}>
+                                <Grid item xs={3}>
+                                    <Button raised onClick={this.clear}>
+                                        <Icon>clear</Icon> Clear
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <Button raised color="primary" onClick={this.solve}>
+                                        <Icon>check</Icon> Solve
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Toolbar>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Card>
+                            <CardContent>
+                                <Typography type="subheading">
+                                    Sudoku as json
+                                </Typography>
+
+                                <TextField
+                                    id="json-input"
+                                    label="json"
+                                    helperText="get or load a sudoku via json"
+                                    fullWidth
+                                    margin="normal"
+                                    value={this.state.sudokuAsString} onChange={this.handleChange}
+                                    />
+                            </CardContent>
+                            <CardActions>
+                                <Button dense onClick={this.getAsString}>Get As String</Button>
+                                <Button dense onClick={this.setFromString}>Set From String</Button>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                </Grid>
             </div>
         );
     }

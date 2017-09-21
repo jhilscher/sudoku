@@ -3,7 +3,7 @@ body {
 }
 
 .sudokuContainer {
-    background: #eee;
+    margin: 15px auto;
 }
 
 .emptyField input {
