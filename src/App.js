@@ -9,6 +9,7 @@ import createReactClass from 'create-react-class';
 
 // Project Components
 import InfoBox from './components/InfoBox';
+import DropDown from './components/DropDown';
 
 // Material UI
 import Icon from 'material-ui/Icon';
@@ -102,7 +103,7 @@ var SDCell = createReactClass({
         }
 
         return (
-            <div className={this.getClassName()}>
+            <div className={this.getClassName() + ' sdCell'}>
                 <input ref="input" style={style} value={this.state.initValue} {...this.linkState() } onClick={this.selectAll} maxLength="1" size="1" type="number" />
             </div>
         );
@@ -137,14 +138,14 @@ var SDTable = createReactClass({
         var self = this;
 
         return (
-            <div className="container-fluid">
+            <div className="sdTable">
 
                 {rows.map(function (eRow, iRow) {
                     return (
-                        <div key={eRow} className="row">
+                        <div key={eRow} className="sdRow">
                             {columns.map(function (eCol, iCol) {
                                 return (
-                                    <div key={iCol + eCol} className="column">
+                                    <div key={iCol + eCol} className="sdColumn">
                                         {self.renderChildren(self.props.index, (iRow * self.props.rowCount) + iCol)}
                                     </div>
                                 );
@@ -158,50 +159,6 @@ var SDTable = createReactClass({
     }
 });
 
-/**
- * Selection for elements of itemList.
- */
-class SudokuDropDown extends React.Component {
-    state = {
-        selectedIndex: 0,
-        selectedItem: this.props.itemList.sudokus[0]
-    };
-
-    handleClickListItem = (event) => {
-        this.setState({
-            selectedIndex: event.target.index,
-            selectedItem: event.target.value
-        });
-        this.props.onChange(event, event.target.index, event.target.value);
-    };
-
-    render() {
-        return (
-            <div>
-                <FormControl>
-                    <InputLabel htmlFor="dropdown">Sudoku</InputLabel>
-                    <Select
-                        value={this.state.selectedItem}
-                        onChange={this.handleClickListItem}
-                        input={<Input id="dropdown" />}
-                    >
-                        {this.props.itemList.sudokus.map((sudoku, index) => (
-                            <MenuItem
-                                key={sudoku.title}
-                                value={sudoku}
-                            >
-                                {sudoku.title}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-            </div>
-        );
-    }
-}
-
-
 var Sudoku = createReactClass({
 
     getInitialState: function () {
@@ -211,7 +168,7 @@ var Sudoku = createReactClass({
     render: function () {
 
         var rowAndColumnSize = Math.sqrt(this.props.size);
-        var width = ~~(70 / this.props.size);
+        var width = ~~(89 / this.props.size);
 
         return (
             <div className="tableContainer">
@@ -357,7 +314,7 @@ var App = createReactClass({
                             </Typography>
                         </Grid>
                         <Grid item>
-                            <SudokuDropDown itemList={Sudokus} onChange={this.onSizeChange} />
+                            <DropDown itemList={Sudokus} onChange={this.onSizeChange} />
                         </Grid>
                         <Grid item>
                             
@@ -385,13 +342,13 @@ var App = createReactClass({
                         }}>
                     <Grid item xs={12}>
                         <Toolbar>
-                            <Grid container spacing={24}>
-                                <Grid item xs={3}>
+                            <Grid container spacing={24} justify='space-around'>
+                                <Grid item>
                                     <Button raised onClick={this.clear}>
                                         <Icon>clear</Icon> Clear
                                     </Button>
                                 </Grid>
-                                <Grid item xs={3}>
+                                <Grid item>
                                     <Button raised color="primary" onClick={this.solve}>
                                         <Icon>check</Icon> Solve
                                     </Button>
@@ -434,7 +391,7 @@ App.propTypes = {
 
 const styles = {
     root: {
-        marginTop: 30,
+        marginTop: 0,
         width: '100%',
     },
 };

@@ -1,8 +1,4 @@
 /**
- * Created by Joerg on 24.04.15.
- */
-
-/**
  * Clones a 2D Array.
  * @returns {Array}
  */

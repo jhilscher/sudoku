@@ -4,3 +4,4 @@
 .chrome/
 bootstrap/
 node_modules/
+build/

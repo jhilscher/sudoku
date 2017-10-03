@@ -2,8 +2,14 @@ body {
     font-family: 'Roboto';
 }
 
+footer {
+    margin: 15px 0;
+    font: bold 14px Roboto;
+}
+
 .sudokuContainer {
-    margin: 15px auto;
+    margin: 0 auto;
+    padding: 15px 0;
 }
 
 .emptyField input {
@@ -40,54 +46,64 @@ body {
 
 .tableContainer {
     margin:0 auto 15px;
+    width: 90vmin;
+    height: 90vmin;
 }
 
-.column {
+.sdTable {
     float: left;
 }
 
-.row .row {
+.sdCell {
+    float: left;
+}
+
+.sdColumn {
+    float: left;
+}
+
+.sdRow .sdRow {
     border-collapse: separate;
 }
 
-.row div:hover {
+.sdRow div:hover {
     background: #fff4f6;
 }
 
-.row .row div:hover {
+.sdRow .sdRow div:hover {
     background: #cdeee8;
 }
 
-.row .row .column div {
+.sdRow .sdRow .sdColumn div {
     border-bottom: 1px solid #999;
     border-left: 1px solid #999;
 
 }
 
-.tableContainer .row .column .container-fluid {
+.tableContainer .sdRow .sdColumn .sdTable {
     border-bottom: 1px solid #999;
     border-left: 1px solid #999;
 }
 
-.tableContainer .row:first-child .container-fluid {
+.tableContainer .sdRow:first-child .sdTable {
     border-top:1px solid #999;
 }
 
-.tableContainer .row .column:last-child .container-fluid {
+.tableContainer .sdRow .sdColumn:last-child .sdTable {
     border-right:1px solid #999;
 }
 
-
-.tableContainer .row:first-child .column .row:first-child {
+.tableContainer .sdRow:first-child .sdColumn .sdRow:first-child {
     border-top:1px solid #999;
 }
 
-.tableContainer .row .column:last-child .row .column:last-child {
+.tableContainer .sdRow .sdColumn:last-child .sdRow .sdColumn:last-child {
     border-right:1px solid #999;
 }
 
-.column input[type="number"] {
+.sdColumn input[type="number"] {
     border: 0px;
+    box-sizing: border-box;
     text-align: center;
 }
 

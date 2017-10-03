@@ -1,6 +1,6 @@
 {
   "name": "sudoku",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": false,
   "homepage": "https://jhilscher.github.io/sudoku",
   "devDependencies": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "create-react-class": "^15.6.0",
+    "gh-pages": "^1.0.0",
     "jquery": "^3.1.0",
     "material-ui": "1.0.0-beta.10",
     "prop-types": "^15.5.10",
@@ -19,6 +20,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   }
 }
