@@ -67,9 +67,12 @@ var solver = (function () {
         };
     };
 
-    const triggerCallback = function(a) {
+    const triggerCallback = function(message, endEvent) {
         if (callback instanceof Function && animation) {
-            callback(a);
+            if (!callback(message)){
+                endEvent();
+                throw new Msg(false, runs, null, 'cancelled', null);
+            }
         }
     };
 
@@ -77,6 +80,7 @@ var solver = (function () {
 
         // if (sudoku[a][b] === value)
         //     return true;
+
 
         // if (squareValues[a][value] || 
         //     rowValues[~~(a / boxSize) * boxSize + ~~(b/ boxSize)][value] || 
@@ -213,17 +217,14 @@ var solver = (function () {
         }
 
         if (animation)
-            triggerCallback("de: " + runs);
+            triggerCallback("de: " + runs, endEvent);
 
         if (stackIndex >= stack.length) {
             console.info("SOLVED! in %d runs.", runs);
             endEvent();
-            triggerCallback("SOLVED");
+            triggerCallback("SOLVED", endEvent);
         }
     };
-
-
-
 
     const backtrackHandler = function (runCallback) {
 
@@ -262,13 +263,13 @@ var solver = (function () {
         /**
          * Sets the initials values of the solver.
          * @param e Sudoku 2d array
-         * @param cb Callback function
+         * @param updateCallback Callback function
          * @param ani Animation flag
          */
-        set: function (e, cb, ani) {
+        set: function (e, updateCallback, ani) {
             console.info("Set Sudoku: ", e);
             animation = ani;
-            callback = cb; // todo remove this callback
+            callback = updateCallback; // todo remove this callback
             runs = 0;
             solved = false;
             sudoku = e;

@@ -3,9 +3,7 @@
  */
 import React from 'react';
 import solver from './sudoku';
-import $ from 'jquery';
 import Sudokus from './resources/sudokus.json';
-import createReactClass from 'create-react-class';
 
 // Project Components
 import InfoBox from './components/InfoBox';
@@ -30,67 +28,48 @@ import Card, { CardActions, CardContent } from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
 // todo: remove global vars
 
-var s = Sudokus.sudokus[0].data.deepClone();
+var loadedSudoku = Sudokus.sudokus[0].data.deepClone();
 
-var initialSudoku = s.deepClone();
+var initialSudoku = loadedSudoku.deepClone();
 
-var running = false;
-
-const StateTwoWayMixin = {
-    linkState: function () {
-        return {
-            value: s[this.props.a][this.props.b] > 0 ? s[this.props.a][this.props.b] : '',
-            onChange: function (event) {
-                var newValue = event.target.value;
-
-                if (isNaN(newValue)) // only numbers allowed
-                    return false;
-
-                s[this.props.a][this.props.b] = ~~newValue;
-
-                this.setState({ initValue: newValue });
-            }.bind(this)
-        }
-    }
-};
 
 /**
  * Cell of the Sudoku Table.
  * @type {*}
  */
-var SDCell = createReactClass({
+class SDCell extends React.Component{
 
-    mixins: [StateTwoWayMixin],
+    selectAll = (event) => {
+        event.target.select();
+    };
 
-    getInitialState: function () {
-        return {
-            initValue: s[this.props.a][this.props.b] > 0 ? s[this.props.a][this.props.b] : ''
-        };
-    },
+    onChange = (event) => {
+        var newValue = event.target.value;
 
-    /**
-     * Selects all of this input field.
-     */
-    selectAll: function () {
-        $(this.refs.input).select();
-    },
+        if (isNaN(newValue)) // only numbers allowed
+            return false;
 
-    getClassName: function () {
-        if (!running) {
+        loadedSudoku[this.props.a][this.props.b] = ~~newValue;
+        this.setState({});
+    };
+
+    getClassName = function () {
+        if (!this.props.running) {
             if (initialSudoku[this.props.a][this.props.b])
                 return "initFilled";
             else
                 return "initEmpty";
         } else if (!initialSudoku[this.props.a][this.props.b]) {
-            if (s[this.props.a][this.props.b] === 0)
+            if (loadedSudoku[this.props.a][this.props.b] === 0)
                 return "emptyField";
             else
                 return "sdFilled";
         }
-    },
+    };
 
-    render: function () {
+    render() {
 
+        var cellValue = loadedSudoku[this.props.a][this.props.b] > 0 ? loadedSudoku[this.props.a][this.props.b] : '';
 
         var style = {
             width: this.props.width + "vmin",
@@ -104,27 +83,28 @@ var SDCell = createReactClass({
 
         return (
             <div className={this.getClassName() + ' sdCell'}>
-                <input ref="input" style={style} value={this.state.initValue} {...this.linkState() } onClick={this.selectAll} maxLength="1" size="1" type="number" />
+                <input ref="input" style={style} value={cellValue} disabled={this.props.running} onChange={this.onChange} onClick={this.selectAll} maxLength="1" size="1" type="number" />
             </div>
         );
     }
-});
+};
 
 /**
  * Table elements, represents a html-table.
  * @type {*}
  */
-var SDTable = createReactClass({
+class SDTable extends React.Component {
 
-    renderChildren: function (a, b) {
+    renderChildren = (a, b) => {
         return React.Children.map(this.props.children, function (child) {
             if (child.type === SDCell)
                 return React.cloneElement(child, { index: b, a: a, b: b, key: (a + b) });
             else
                 return React.cloneElement(child, { index: b });
         })
-    },
-    render: function () {
+    }    
+    
+    render() {
 
         var columns = [];
         var rows = [];
@@ -157,15 +137,11 @@ var SDTable = createReactClass({
             </div>
         );
     }
-});
+};
 
-var Sudoku = createReactClass({
+class Sudoku extends React.Component {
 
-    getInitialState: function () {
-        return {};
-    },
-
-    render: function () {
+    render () {
 
         var rowAndColumnSize = Math.sqrt(this.props.size);
         var width = ~~(89 / this.props.size);
@@ -174,24 +150,37 @@ var Sudoku = createReactClass({
             <div className="tableContainer">
                 <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
                     <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
-                        <SDCell info={this.props.msg} width={width} />
+                        <SDCell info={this.props.msg} width={width} running={this.props.running} />
                     </SDTable>
                 </SDTable>
             </div>
         );
     }
-});
+};
 
 /**
- * Complete Sudoku component.
+ * Complete App component.
  * @type {*}
  */
-var App = createReactClass({
+class App extends React.Component {
+    
+    state = {
+        isAnimationChecked: false,
+        sudokuAsString: "",
+        showResults: false,
+        msg: null,
+        size: 9,
+        running: false
+    };
 
-    clear: function () {
-        s.forEach(function (arr, a) {
+    requestCancel = false;
+
+    //loadedSudoku;
+
+    clear = () => {
+        loadedSudoku.forEach(function (arr, a) {
             arr.forEach(function (ele, b) {
-                s[a][b] = 0;
+                loadedSudoku[a][b] = 0;
                 initialSudoku[a][b] = 0;
             });
         });
@@ -199,103 +188,100 @@ var App = createReactClass({
             showResults: false,
             msg: null
         });
-    },
-
-    update: function (args) {
-        console.log(args);
+    };
+    
+    update = (args) => {
         this.forceUpdate();
-    },
+        return !this.requestCancel;
+    };
+    
+    componentDidMount() {
+        // initial
+        loadedSudoku = Sudokus.sudokus[0].data.deepClone();
 
-    componentDidMount: function () {
-        solver.set(s, this.update, this.state.isChecked);
+        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
         initialSudoku = solver.getInitialSudoku();
-    },
+    };
+    
+    solve = () => {
 
-    solve: function () {
-        running = true;
+        if (this.state.running) {
+            this.requestCancel = true;
+            this.state.running = false;
+            return;
+        }
 
-        solver.set(s, this.update, this.state.isChecked);
+        this.requestCancel = false;
+        this.state.running = true;
+
+        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
         initialSudoku = solver.getInitialSudoku();
-
+        
         var success = function (msg) {
             this.setState({
                 showResults: true,
-                msg: msg
+                msg: msg,
+                running: false
             });
         };
         var successCallback = success.bind(this);
 
         solver.run(successCallback);
+    };
 
-    },
+    onAnimationChange = () => {
+        this.setState({ isAnimationChecked: !this.state.isAnimationChecked });
+    };
 
-    onChange: function () {
-        this.setState({ isChecked: !this.state.isChecked });
-    },
+    onSizeChange = (event, index, value) => {
 
-    onSizeChange: function (event, index, value) {
-
-        s = value.data.deepClone();
+        loadedSudoku = value.data.deepClone();
 
         this.setState({
-            size: s.length,
-            selectedSudoku: value,
+            size: loadedSudoku.length,
             showResults: false
         });
 
-        initialSudoku = s.deepClone();
+        initialSudoku = loadedSudoku.deepClone();
 
-        solver.set(s, this.update, this.state.isChecked);
-    },
+        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
+    };
 
-    onInfoBoxClose: function (event) {
+    onInfoBoxClose = (event) => {
         this.setState({
             showResults: false
         });
-    },
+    };
 
-    handleChange: function (event) {
+    onJsonInputChange = (event) => {
 
         var newValue = event.target.value;
 
         this.setState({
             sudokuAsString: newValue
         });
-    },
+    };
 
-    getInitialState: function () {
-        return {
-            isChecked: false,
-            sudokuAsString: "",
-            initialSudoku: [],
-            showResults: false,
-            msg: null,
-            size: 9,
-            selectedSudoku: 91
-        };
-    },
-
-    getAsString: function () {
+    getAsString = () => {
         this.setState({ sudokuAsString: solver.print() });
-    },
+    };
 
-    setFromString: function () {
+    setFromString = () => {
 
         if (this.state.sudokuAsString) {
-            s = solver.getSudokuFromString(this.state.sudokuAsString);
-            solver.set(s, this.update, this.state.isChecked);
+            loadedSudoku = solver.getSudokuFromString(this.state.sudokuAsString);
+            solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
             initialSudoku = solver.getInitialSudoku();
-            console.log(s);
-            running = false;
 
             this.setState({
+                running: false,
                 showResults: false,
                 msg: null
             });
         }
-    },
+    };
 
-    render: function () {
+    render () {
 
         return (
             <div>
@@ -322,8 +308,8 @@ var App = createReactClass({
                                 control={
                                     <Switch
                                         id='animation-switch'
-                                        checked={this.state.isChecked}
-                                        onChange={this.onChange}
+                                        checked={this.state.isAnimationChecked}
+                                        onChange={this.onAnimationChange}
                                     />
                                 }
                                 label="animation" />
@@ -334,7 +320,7 @@ var App = createReactClass({
 
                 <div className="sudokuContainer">
                     <InfoBox msg={this.state.msg} open={this.state.showResults} onClose={this.onInfoBoxClose} />
-                    <Sudoku msg={this.state.msg} size={this.state.size} />
+                    <Sudoku msg={this.state.msg} size={this.state.size} running={this.state.running} />
                 </div>
             
                 <Grid container spacing={24} style={{
@@ -350,7 +336,7 @@ var App = createReactClass({
                                 </Grid>
                                 <Grid item>
                                     <Button raised color="primary" onClick={this.solve}>
-                                        <Icon>check</Icon> Solve
+                                    {!this.state.running? <Icon>check</Icon> :<Icon>autorenew</Icon>}  Solve
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -370,7 +356,7 @@ var App = createReactClass({
                                     helperText="get or load a sudoku via json"
                                     fullWidth
                                     margin="normal"
-                                    value={this.state.sudokuAsString} onChange={this.handleChange}
+                                    value={this.state.sudokuAsString} onChange={this.onJsonInputChange}
                                     />
                             </CardContent>
                             <CardActions>
@@ -382,8 +368,8 @@ var App = createReactClass({
                 </Grid>
             </div>
         );
-    }
-});
+    };
+}
 
 App.propTypes = {
     classes: PropTypes.object.isRequired,
