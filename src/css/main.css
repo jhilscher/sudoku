@@ -133,3 +133,14 @@ input::-webkit-inner-spin-button {
     0% {background: #eed0cd;}
     100% {background: none;}
 }
+
+nput[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+

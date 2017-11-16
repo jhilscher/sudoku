@@ -37,7 +37,21 @@ var initialSudoku = loadedSudoku.deepClone();
  * Cell of the Sudoku Table.
  * @type {*}
  */
-class SDCell extends React.Component{
+class SDCell extends React.Component {
+
+    state = {
+        cellValue: this.props.value > 0 ? this.props.value : ""
+    };
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            cellValue: nextProps.value > 0 ? nextProps.value : ""
+        });
+    };
+    
+    shouldComponentUpdate(nextProps) {
+        return this.state.cellValue !== nextProps.value;
+    };
 
     selectAll = (event) => {
         event.target.select();
@@ -49,8 +63,13 @@ class SDCell extends React.Component{
         if (isNaN(newValue)) // only numbers allowed
             return false;
 
-        loadedSudoku[this.props.a][this.props.b] = ~~newValue;
-        this.setState({});
+        //loadedSudoku[this.props.a][this.props.b] = ~~newValue;
+
+        this.props.onChange(this.props.a, this.props.b, ~~newValue);
+
+        this.setState({
+            cellValue: newValue
+        });
     };
 
     getClassName = function () {
@@ -58,7 +77,9 @@ class SDCell extends React.Component{
             if (initialSudoku[this.props.a][this.props.b])
                 return "initFilled";
             else
-                return "initEmpty";
+                return "initEmpty"; 
+        } else if (initialSudoku[this.props.a][this.props.b] != 0) {
+                return "initFilled";
         } else if (!initialSudoku[this.props.a][this.props.b]) {
             if (loadedSudoku[this.props.a][this.props.b] === 0)
                 return "emptyField";
@@ -69,11 +90,13 @@ class SDCell extends React.Component{
 
     render() {
 
-        var cellValue = loadedSudoku[this.props.a][this.props.b] > 0 ? loadedSudoku[this.props.a][this.props.b] : '';
+        //var cellValue = this.props.value > 0 ? this.props.value : '';//loadedSudoku[this.props.a][this.props.b] > 0 ? loadedSudoku[this.props.a][this.props.b] : '';
+
+        var cellValue = this.state.cellValue;
 
         var style = {
-            width: this.props.width + "vmin",
-            height: this.props.width + "vmin"
+            width: this.props.width + "px",
+            height: this.props.width + "px"
         };
 
         // todo: unschön
@@ -83,7 +106,7 @@ class SDCell extends React.Component{
 
         return (
             <div className={this.getClassName() + ' sdCell'}>
-                <input ref="input" style={style} value={cellValue} disabled={this.props.running} onChange={this.onChange} onClick={this.selectAll} maxLength="1" size="1" type="number" />
+                <input ref="input" style={style} value={cellValue} disabled={this.props.running} onChange={this.onChange} onClick={this.selectAll} type="number" />
             </div>
         );
     }
@@ -95,10 +118,26 @@ class SDCell extends React.Component{
  */
 class SDTable extends React.Component {
 
+    state = {
+        selectedSudoku: this.props.selectedSudoku
+    };
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({selectedSudoku: nextProps.selectedSudoku});
+    }
+
     renderChildren = (a, b) => {
+
+        let self = this;
+
         return React.Children.map(this.props.children, function (child) {
             if (child.type === SDCell)
-                return React.cloneElement(child, { index: b, a: a, b: b, key: (a + b) });
+                return React.cloneElement(child, { 
+                    index: b, 
+                    a: a, 
+                    b: b, 
+                    value: self.state.selectedSudoku[a][b],
+                    key: (a + b) });
             else
                 return React.cloneElement(child, { index: b });
         })
@@ -106,14 +145,8 @@ class SDTable extends React.Component {
     
     render() {
 
-        var columns = [];
-        var rows = [];
-
-        for (let i = 0; i < this.props.rowCount; i++)
-            rows.push(i);
-
-        for (let i = 0; i < this.props.columnCount; i++)
-            columns.push(i);
+        let columns = Array.from(new Array(this.props.columnCount), (val,index) => index);
+        let rows = Array.from(new Array(this.props.rowCount), (val,index) => index);
 
         var self = this;
 
@@ -141,21 +174,68 @@ class SDTable extends React.Component {
 
 class Sudoku extends React.Component {
 
+    getWidth = () => {
+        return ~~((Math.min(window.innerWidth, window.innerHeight) - 120) / this.props.size);
+    }
+
+    state = {
+        selectedSudoku: this.props.selectedSudoku,
+        width: this.getWidth()
+    };
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({selectedSudoku: nextProps.selectedSudoku});
+    }
+
+    shouldComponentUpdate(nextProps) {
+        // must be true, otherwise won't update on animation
+        return true;//this.state.selectedSudoku != nextProps.selectedSudoku;
+    };
+
+
+    updateDimensions = () => {
+        this.setState({width: this.getWidth()});
+    };
+
+    componentWillMount = () => {
+        this.updateDimensions();
+    };
+
+    componentDidMount = () => {
+        window.addEventListener("resize", this.updateDimensions);
+    };
+
+    componentWillUnmount = () => {
+        window.removeEventListener("resize", this.updateDimensions);
+    };
+
+    handleChange = (a, b, value) => {
+        this.state.selectedSudoku[a][b] = value;
+    };
+
     render () {
 
-        var rowAndColumnSize = Math.sqrt(this.props.size);
-        var width = ~~(89 / this.props.size);
+        let rowAndColumnSize = Math.sqrt(this.props.size);
+
+        //var width = ~~((Math.min(window.innerWidth, window.innerHeight) - 100) / this.props.size);
+
+        //let width = ~~(89 / this.props.size);
+
+        let columns = Array.from(new Array(rowAndColumnSize), (val,index) => index);
+        let rows = Array.from(new Array(rowAndColumnSize), (val,index) => index);
+
+        let self = this;
 
         return (
             <div className="tableContainer">
                 <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
-                    <SDTable rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
-                        <SDCell info={this.props.msg} width={width} running={this.props.running} />
+                    <SDTable selectedSudoku={this.state.selectedSudoku} rowCount={rowAndColumnSize} columnCount={rowAndColumnSize}>
+                        <SDCell info={this.props.msg} width={this.state.width} onChange={this.handleChange} running={this.props.running} />
                     </SDTable>
                 </SDTable>
             </div>
         );
-    }
+    };
 };
 
 /**
@@ -169,8 +249,9 @@ class App extends React.Component {
         sudokuAsString: "",
         showResults: false,
         msg: null,
+        running: false,
+        selectedSudoku: Sudokus.sudokus[0].data.deepClone(),
         size: 9,
-        running: false
     };
 
     requestCancel = false;
@@ -178,12 +259,15 @@ class App extends React.Component {
     //loadedSudoku;
 
     clear = () => {
-        loadedSudoku.forEach(function (arr, a) {
+        this.state.selectedSudoku.forEach(function (arr, a) {
             arr.forEach(function (ele, b) {
-                loadedSudoku[a][b] = 0;
-                initialSudoku[a][b] = 0;
+                arr[b] = 0;
             });
         });
+
+        solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
+        initialSudoku = solver.getInitialSudoku();
+
         this.setState({
             showResults: false,
             msg: null
@@ -196,10 +280,7 @@ class App extends React.Component {
     };
     
     componentDidMount() {
-        // initial
-        loadedSudoku = Sudokus.sudokus[0].data.deepClone();
-
-        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
+        solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
         initialSudoku = solver.getInitialSudoku();
     };
     
@@ -214,7 +295,7 @@ class App extends React.Component {
         this.requestCancel = false;
         this.state.running = true;
 
-        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
+        solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
         initialSudoku = solver.getInitialSudoku();
         
         var success = function (msg) {
@@ -235,16 +316,16 @@ class App extends React.Component {
 
     onSizeChange = (event, index, value) => {
 
-        loadedSudoku = value.data.deepClone();
+        let sudoku = value.data.deepClone();
 
         this.setState({
-            size: loadedSudoku.length,
-            showResults: false
+            size: sudoku.length,
+            showResults: false,
+            selectedSudoku: sudoku
         });
 
-        initialSudoku = loadedSudoku.deepClone();
-
-        solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
+        solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
+        initialSudoku = solver.getInitialSudoku();
     };
 
     onInfoBoxClose = (event) => {
@@ -269,14 +350,16 @@ class App extends React.Component {
     setFromString = () => {
 
         if (this.state.sudokuAsString) {
-            loadedSudoku = solver.getSudokuFromString(this.state.sudokuAsString);
-            solver.set(loadedSudoku, this.update, this.state.isAnimationChecked);
+            let sudoku = solver.getSudokuFromString(this.state.sudokuAsString);
+            solver.set(sudoku, this.update, this.state.isAnimationChecked);
             initialSudoku = solver.getInitialSudoku();
 
             this.setState({
                 running: false,
                 showResults: false,
-                msg: null
+                msg: null,
+                size: sudoku.length,
+                selectedSudoku: sudoku
             });
         }
     };
@@ -320,7 +403,7 @@ class App extends React.Component {
 
                 <div className="sudokuContainer">
                     <InfoBox msg={this.state.msg} open={this.state.showResults} onClose={this.onInfoBoxClose} />
-                    <Sudoku msg={this.state.msg} size={this.state.size} running={this.state.running} />
+                    <Sudoku selectedSudoku={this.state.selectedSudoku} msg={this.state.msg} size={this.state.size} running={this.state.running} />
                 </div>
             
                 <Grid container spacing={24} style={{
