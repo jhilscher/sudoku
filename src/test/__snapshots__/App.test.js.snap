@@ -290,7 +290,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -311,7 +311,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -332,7 +332,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -357,7 +357,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -378,7 +378,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -399,7 +399,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -445,7 +445,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -466,7 +466,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -520,7 +520,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -541,7 +541,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -566,7 +566,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -608,7 +608,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -654,7 +654,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -675,7 +675,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -729,7 +729,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -750,7 +750,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -775,7 +775,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -842,7 +842,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -884,7 +884,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -921,7 +921,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -963,7 +963,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -988,7 +988,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1009,7 +1009,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1055,7 +1055,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1076,7 +1076,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1151,7 +1151,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1172,7 +1172,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1218,7 +1218,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1264,7 +1264,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1285,7 +1285,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1360,7 +1360,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1381,7 +1381,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1427,7 +1427,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1448,7 +1448,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1473,7 +1473,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1515,7 +1515,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1552,7 +1552,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1594,7 +1594,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1661,7 +1661,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1686,7 +1686,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1707,7 +1707,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1761,7 +1761,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1782,7 +1782,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1828,7 +1828,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1870,7 +1870,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1895,7 +1895,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1916,7 +1916,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1970,7 +1970,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -1991,7 +1991,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2037,7 +2037,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2058,7 +2058,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2079,7 +2079,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2104,7 +2104,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2125,7 +2125,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}
@@ -2146,7 +2146,7 @@ exports[`App properties  1`] = `
                   className="sdColumn"
                 >
                   <div
-                    className="initEmpty sdCell"
+                    className="emptyField sdCell"
                   >
                     <input
                       disabled={false}

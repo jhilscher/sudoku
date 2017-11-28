@@ -267,7 +267,7 @@ var solver = (function () {
          * @param ani Animation flag
          */
         set: function (e, updateCallback, ani) {
-            console.info("Set Sudoku: ", e);
+            //console.info("Set Sudoku: ", e);
             animation = ani;
             callback = updateCallback; // todo remove this callback
             runs = 0;
@@ -285,7 +285,7 @@ var solver = (function () {
             squareValues = Array.from({ length: sudokuSize }, () => Array.from({ length: sudokuSize + 1}, () => false));
             errors = '';
 
-            console.info('Size, BoxSize, Open:', sudokuSize, boxSize, openFields);
+            //console.info('Size, BoxSize, Open:', sudokuSize, boxSize, openFields);
         },
 
         /**
@@ -363,7 +363,6 @@ var solver = (function () {
          * @returns {Array}
          */
         getSudokuFromString: function (s) {
-
             return JSON.parse(s);
         },
 
@@ -373,7 +372,7 @@ var solver = (function () {
          * @returns String
          */
         print: function() {
-
+            
             if (!sudoku)
                 return "";
 
