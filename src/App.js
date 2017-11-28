@@ -26,11 +26,6 @@ import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import TextField from 'material-ui/TextField';
-// todo: remove global vars
-
-var loadedSudoku = Sudokus.sudokus[0].data.deepClone();
-
-var initialSudoku = loadedSudoku.deepClone();
 
 
 /**
@@ -40,17 +35,19 @@ var initialSudoku = loadedSudoku.deepClone();
 class SDCell extends React.Component {
 
     state = {
-        cellValue: this.props.value > 0 ? this.props.value : ""
+        cellValue: this.props.value > 0 ? this.props.value : '',
+        initValue: this.props.running? 0 : this.props.value
     };
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            cellValue: nextProps.value > 0 ? nextProps.value : ""
+            cellValue: nextProps.value > 0 ? nextProps.value : '',
+            initValue: nextProps.running? 0 : nextProps.value
         });
     };
     
-    shouldComponentUpdate(nextProps) {
-        return this.state.cellValue !== nextProps.value;
+    shouldComponentUpdate = (nextProps) => {
+        return this.state.cellValue !== nextProps.value || this.props.width !== nextProps.width;
     };
 
     selectAll = (event) => {
@@ -63,34 +60,32 @@ class SDCell extends React.Component {
         if (isNaN(newValue)) // only numbers allowed
             return false;
 
-        //loadedSudoku[this.props.a][this.props.b] = ~~newValue;
-
         this.props.onChange(this.props.a, this.props.b, ~~newValue);
 
         this.setState({
-            cellValue: newValue
+            cellValue: newValue,
+            initValue: this.props.running? 0 : this.props.value
         });
     };
 
     getClassName = function () {
         if (!this.props.running) {
-            if (initialSudoku[this.props.a][this.props.b])
+            if (this.state.initValue > 0)
                 return "initFilled";
-            else
-                return "initEmpty"; 
-        } else if (initialSudoku[this.props.a][this.props.b] != 0) {
-                return "initFilled";
-        } else if (!initialSudoku[this.props.a][this.props.b]) {
-            if (loadedSudoku[this.props.a][this.props.b] === 0)
+            else 
                 return "emptyField";
-            else
-                return "sdFilled";
         }
+
+        if (this.state.initValue > 0)
+            return "initFilled";
+        
+        if (this.state.cellValue)
+            return "sdFilled";
+
+        return "emptyField";
     };
 
     render() {
-
-        //var cellValue = this.props.value > 0 ? this.props.value : '';//loadedSudoku[this.props.a][this.props.b] > 0 ? loadedSudoku[this.props.a][this.props.b] : '';
 
         var cellValue = this.state.cellValue;
 
@@ -99,7 +94,7 @@ class SDCell extends React.Component {
             height: this.props.width + "px"
         };
 
-        // todo: unschön
+        // hightlights a faulty value
         if (this.props.info && this.props.info.save && this.props.info.save.cordA === this.props.a && this.props.info.save.cordB === this.props.b) {
             style.background = '#f00';
         }
@@ -188,10 +183,8 @@ class Sudoku extends React.Component {
     }
 
     shouldComponentUpdate(nextProps) {
-        // must be true, otherwise won't update on animation
         return true;//this.state.selectedSudoku != nextProps.selectedSudoku;
     };
-
 
     updateDimensions = () => {
         this.setState({width: this.getWidth()});
@@ -216,15 +209,6 @@ class Sudoku extends React.Component {
     render () {
 
         let rowAndColumnSize = Math.sqrt(this.props.size);
-
-        //var width = ~~((Math.min(window.innerWidth, window.innerHeight) - 100) / this.props.size);
-
-        //let width = ~~(89 / this.props.size);
-
-        let columns = Array.from(new Array(rowAndColumnSize), (val,index) => index);
-        let rows = Array.from(new Array(rowAndColumnSize), (val,index) => index);
-
-        let self = this;
 
         return (
             <div className="tableContainer">
@@ -256,8 +240,6 @@ class App extends React.Component {
 
     requestCancel = false;
 
-    //loadedSudoku;
-
     clear = () => {
         this.state.selectedSudoku.forEach(function (arr, a) {
             arr.forEach(function (ele, b) {
@@ -266,7 +248,6 @@ class App extends React.Component {
         });
 
         solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
-        initialSudoku = solver.getInitialSudoku();
 
         this.setState({
             showResults: false,
@@ -281,30 +262,31 @@ class App extends React.Component {
     
     componentDidMount() {
         solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
-        initialSudoku = solver.getInitialSudoku();
     };
     
     solve = () => {
 
         if (this.state.running) {
             this.requestCancel = true;
-            this.state.running = false;
+            this.setState({ running: false });
             return;
         }
 
         this.requestCancel = false;
-        this.state.running = true;
+
+        this.setState({ running: true });
 
         solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
-        initialSudoku = solver.getInitialSudoku();
         
         var success = function (msg) {
             this.setState({
                 showResults: true,
-                msg: msg,
-                running: false
+                msg: msg
             });
+
+            this.setState({ running: false });
         };
+
         var successCallback = success.bind(this);
 
         solver.run(successCallback);
@@ -325,7 +307,6 @@ class App extends React.Component {
         });
 
         solver.set(this.state.selectedSudoku, this.update, this.state.isAnimationChecked);
-        initialSudoku = solver.getInitialSudoku();
     };
 
     onInfoBoxClose = (event) => {
@@ -352,7 +333,6 @@ class App extends React.Component {
         if (this.state.sudokuAsString) {
             let sudoku = solver.getSudokuFromString(this.state.sudokuAsString);
             solver.set(sudoku, this.update, this.state.isAnimationChecked);
-            initialSudoku = solver.getInitialSudoku();
 
             this.setState({
                 running: false,
