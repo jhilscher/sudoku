@@ -281,12 +281,11 @@ class App extends React.Component {
         var success = function (msg) {
             this.setState({
                 showResults: true,
-                msg: msg
+                msg: msg,
+                running: false
             });
-
-            this.setState({ running: false });
         };
-
+        
         var successCallback = success.bind(this);
 
         solver.run(successCallback);
