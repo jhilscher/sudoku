@@ -4,7 +4,8 @@ exports[`App properties  1`] = `
 <div>
   <header>
     <div
-      className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-16-17 MuiGrid-align-xs-flex-end-10"
+      align="flex-end"
+      className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-16-23"
       style={
         Object {
           "background": "#fff",
@@ -15,11 +16,11 @@ exports[`App properties  1`] = `
         className="MuiGrid-typeItem-3"
       >
         <h1
-          className="MuiTypography-root-85 MuiTypography-headline-90"
+          className="MuiTypography-root-91 MuiTypography-headline-96"
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-107"
+            className="material-icons MuiIcon-root-115"
             style={
               Object {
                 "color": "#ccc",
@@ -37,30 +38,31 @@ exports[`App properties  1`] = `
       >
         <div>
           <div
-            className="MuiFormControl-root-114"
+            className="MuiFormControl-root-122"
             onBlur={[Function]}
             onFocus={[Function]}
             required={false}
           >
             <label
-              className="MuiFormLabel-root-124 MuiInputLabel-root-118 MuiInputLabel-formControl-119 MuiInputLabel-animated-122 MuiInputLabel-shrink-121"
+              className="MuiFormLabel-root-132 MuiInputLabel-root-126 MuiInputLabel-formControl-127 MuiInputLabel-animated-130 MuiInputLabel-shrink-129"
+              data-shrink={true}
               htmlFor="dropdown"
             >
               Sudoku
             </label>
             <div
-              className="MuiInput-root-133 MuiInput-formControl-134 MuiInput-inkbar-135 MuiInput-underline-141"
+              className="MuiInput-root-141 MuiInput-formControl-142 MuiInput-inkbar-143 MuiInput-underline-147"
               onBlur={[Function]}
               onFocus={[Function]}
             >
               <div
-                className="MuiSelect-root-128"
+                className="MuiSelect-root-136"
               >
                 <div
                   aria-haspopup="true"
                   aria-owns={null}
                   aria-pressed="false"
-                  className="MuiSelect-select-129 MuiSelect-selectMenu-130 MuiInput-input-137 MuiInput-inputSingleline-144"
+                  className="MuiSelect-select-137 MuiSelect-selectMenu-138 MuiInput-input-150 MuiInput-inputSingleline-153"
                   onBlur={[Function]}
                   onClick={[Function]}
                   onFocus={undefined}
@@ -193,7 +195,7 @@ exports[`App properties  1`] = `
                 />
                 <svg
                   aria-hidden="true"
-                  className="MuiSvgIcon-root-148 MuiSelect-icon-132"
+                  className="MuiSvgIcon-root-156 MuiSelect-icon-140"
                   focusable="false"
                   viewBox="0 0 24 24"
                 >
@@ -210,13 +212,13 @@ exports[`App properties  1`] = `
         className="MuiGrid-typeItem-3"
       >
         <label
-          className="MuiFormControlLabel-root-153"
+          className="MuiFormControlLabel-root-161"
         >
           <div
-            className="MuiSwitch-root-156"
+            className="MuiSwitch-root-164"
           >
             <span
-              className="MuiButtonBase-root-176 MuiIconButton-root-167 MuiSwitchBase-root-162 MuiSwitchBase-default-164 MuiSwitch-default-159"
+              className="MuiButtonBase-root-184 MuiIconButton-root-175 MuiSwitchBase-root-170 MuiSwitchBase-default-172 MuiSwitch-default-167"
               disabled={false}
               id="animation-switch"
               onBlur={[Function]}
@@ -227,20 +229,21 @@ exports[`App properties  1`] = `
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
               onTouchEnd={[Function]}
+              onTouchMove={[Function]}
               onTouchStart={[Function]}
               role={undefined}
               tabIndex={null}
             >
               <span
-                className="MuiIconButton-label-173"
+                className="MuiIconButton-label-181"
               >
-                <div
-                  className="MuiSwitch-icon-158"
+                <span
+                  className="MuiSwitch-icon-166"
                 />
                 <input
                   checked={false}
-                  className="MuiSwitchBase-input-163"
-                  disabled={false}
+                  className="MuiSwitchBase-input-171"
+                  disabled={undefined}
                   name={undefined}
                   onChange={[Function]}
                   tabIndex={undefined}
@@ -249,18 +252,18 @@ exports[`App properties  1`] = `
                 />
               </span>
               <span
-                className="MuiTouchRipple-root-178"
+                className="MuiTouchRipple-root-186"
               />
             </span>
-            <div
-              className="MuiSwitch-bar-157"
+            <span
+              className="MuiSwitch-bar-165"
             />
           </div>
-          <p
-            className="MuiTypography-root-85 MuiTypography-body1-94 MuiFormControlLabel-label-155"
+          <span
+            className="MuiTypography-root-91 MuiTypography-body1-100 MuiFormControlLabel-label-163"
           >
             animation
-          </p>
+          </span>
         </label>
       </div>
     </div>
@@ -2171,7 +2174,7 @@ exports[`App properties  1`] = `
     </div>
   </div>
   <div
-    className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-24-18"
+    className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-24-24"
     style={
       Object {
         "background": "#eee",
@@ -2179,19 +2182,19 @@ exports[`App properties  1`] = `
     }
   >
     <div
-      className="MuiGrid-typeItem-3 MuiGrid-grid-xs-12-32"
+      className="MuiGrid-typeItem-3 MuiGrid-grid-xs-12-38"
     >
       <div
-        className="MuiToolbar-root-192 MuiToolbar-gutters-193"
+        className="MuiToolbar-root-200 MuiToolbar-gutters-201"
       >
         <div
-          className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-24-18 MuiGrid-justify-xs-space-around-15"
+          className="MuiGrid-typeContainer-2 MuiGrid-spacing-xs-24-24 MuiGrid-justify-xs-space-around-21"
         >
           <div
             className="MuiGrid-typeItem-3"
           >
             <button
-              className="MuiButtonBase-root-176 MuiButton-root-194 MuiButton-raised-201"
+              className="MuiButtonBase-root-184 MuiButton-root-202 MuiButton-raised-209"
               disabled={false}
               onBlur={[Function]}
               onClick={[Function]}
@@ -2202,24 +2205,25 @@ exports[`App properties  1`] = `
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
               onTouchEnd={[Function]}
+              onTouchMove={[Function]}
               onTouchStart={[Function]}
               role="button"
               tabIndex={0}
               type="button"
             >
               <span
-                className="MuiButton-label-196"
+                className="MuiButton-label-204"
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-107"
+                  className="material-icons MuiIcon-root-115"
                 >
                   clear
                 </span>
                  Clear
               </span>
               <span
-                className="MuiTouchRipple-root-178"
+                className="MuiTouchRipple-root-186"
               />
             </button>
           </div>
@@ -2227,7 +2231,7 @@ exports[`App properties  1`] = `
             className="MuiGrid-typeItem-3"
           >
             <button
-              className="MuiButtonBase-root-176 MuiButton-root-194 MuiButton-raised-201 MuiButton-raisedPrimary-203"
+              className="MuiButtonBase-root-184 MuiButton-root-202 MuiButton-raised-209 MuiButton-raisedPrimary-211"
               disabled={false}
               onBlur={[Function]}
               onClick={[Function]}
@@ -2238,24 +2242,25 @@ exports[`App properties  1`] = `
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
               onTouchEnd={[Function]}
+              onTouchMove={[Function]}
               onTouchStart={[Function]}
               role="button"
               tabIndex={0}
               type="button"
             >
               <span
-                className="MuiButton-label-196"
+                className="MuiButton-label-204"
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-107"
+                  className="material-icons MuiIcon-root-115"
                 >
                   check
                 </span>
                   Solve
               </span>
               <span
-                className="MuiTouchRipple-root-178"
+                className="MuiTouchRipple-root-186"
               />
             </button>
           </div>
@@ -2263,41 +2268,41 @@ exports[`App properties  1`] = `
       </div>
     </div>
     <div
-      className="MuiGrid-typeItem-3 MuiGrid-grid-xs-12-32"
+      className="MuiGrid-typeItem-3 MuiGrid-grid-xs-12-38"
     >
       <div
-        className="MuiPaper-root-208 MuiPaper-shadow2-212 MuiPaper-rounded-209"
+        className="MuiPaper-root-216 MuiPaper-shadow2-220 MuiPaper-rounded-217"
       >
         <div
-          className="MuiCardContent-root-235"
+          className="MuiCardContent-root-243"
         >
           <h3
-            className="MuiTypography-root-85 MuiTypography-subheading-92"
+            className="MuiTypography-root-91 MuiTypography-subheading-98"
           >
             Sudoku as json
           </h3>
           <div
-            className="MuiFormControl-root-114 MuiFormControl-marginNormal-115 MuiFormControl-fullWidth-117"
+            className="MuiFormControl-root-122 MuiFormControl-marginNormal-123 MuiFormControl-fullWidth-125"
             onBlur={[Function]}
-            onChange={[Function]}
             onFocus={[Function]}
             required={false}
           >
             <label
-              className="MuiFormLabel-root-124 MuiInputLabel-root-118 MuiInputLabel-formControl-119 MuiInputLabel-animated-122"
+              className="MuiFormLabel-root-132 MuiInputLabel-root-126 MuiInputLabel-formControl-127 MuiInputLabel-animated-130"
+              data-shrink={false}
               htmlFor="json-input"
             >
               json
             </label>
             <div
-              className="MuiInput-root-133 MuiInput-formControl-134 MuiInput-inkbar-135 MuiInput-underline-141"
+              className="MuiInput-root-141 MuiInput-formControl-142 MuiInput-inkbar-143 MuiInput-underline-147"
               onBlur={[Function]}
               onFocus={[Function]}
             >
               <input
                 autoComplete={undefined}
                 autoFocus={undefined}
-                className="MuiInput-input-137 MuiInput-inputSingleline-144"
+                className="MuiInput-input-150 MuiInput-inputSingleline-153"
                 defaultValue={undefined}
                 disabled={false}
                 id="json-input"
@@ -2314,17 +2319,17 @@ exports[`App properties  1`] = `
               />
             </div>
             <p
-              className="MuiFormHelperText-root-236"
+              className="MuiFormHelperText-root-244"
             >
               get or load a sudoku via json
             </p>
           </div>
         </div>
         <div
-          className="MuiCardActions-root-240"
+          className="MuiCardActions-root-248"
         >
           <button
-            className="MuiButtonBase-root-176 MuiButton-root-194 MuiButton-dense-195 MuiCardActions-actionSpacing-241"
+            className="MuiButtonBase-root-184 MuiButton-root-202 MuiButton-dense-203 MuiCardActions-action-249"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -2335,22 +2340,23 @@ exports[`App properties  1`] = `
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
             onTouchEnd={[Function]}
+            onTouchMove={[Function]}
             onTouchStart={[Function]}
             role="button"
             tabIndex={0}
             type="button"
           >
             <span
-              className="MuiButton-label-196"
+              className="MuiButton-label-204"
             >
               Get As String
             </span>
             <span
-              className="MuiTouchRipple-root-178"
+              className="MuiTouchRipple-root-186"
             />
           </button>
           <button
-            className="MuiButtonBase-root-176 MuiButton-root-194 MuiButton-dense-195 MuiCardActions-actionSpacing-241"
+            className="MuiButtonBase-root-184 MuiButton-root-202 MuiButton-dense-203 MuiCardActions-action-249"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -2361,18 +2367,19 @@ exports[`App properties  1`] = `
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
             onTouchEnd={[Function]}
+            onTouchMove={[Function]}
             onTouchStart={[Function]}
             role="button"
             tabIndex={0}
             type="button"
           >
             <span
-              className="MuiButton-label-196"
+              className="MuiButton-label-204"
             >
               Set From String
             </span>
             <span
-              className="MuiTouchRipple-root-178"
+              className="MuiTouchRipple-root-186"
             />
           </button>
         </div>

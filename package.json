@@ -4,14 +4,15 @@
   "private": false,
   "homepage": "https://jhilscher.github.io/sudoku",
   "devDependencies": {
-    "react-scripts": "^1.0.10",
-    "react-test-renderer": "^15.3.2",
     "eslint": "^1.10.3",
-    "eslint-plugin-react": "^3.5.0"
+    "eslint-plugin-react": "^3.5.0",
+    "gh-pages": "^1.0.0",
+    "jest": "^21.2.1",
+    "react-scripts": "^1.0.10",
+    "react-test-renderer": "^15.3.2"
   },
   "dependencies": {
-    "gh-pages": "^1.0.0",
-    "material-ui": "^1.0.0-beta.10",
+    "material-ui": "^1.0.0-beta.22",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"

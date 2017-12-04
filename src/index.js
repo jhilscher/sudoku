@@ -15,5 +15,5 @@ const Wrapper = () => (
 
 ReactDOM.render(
   <Wrapper />,
-  document.getElementById('playGround')
+  document.querySelector('#app')
 );
